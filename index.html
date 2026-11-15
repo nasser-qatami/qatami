@@ -156,6 +156,7 @@ body.hasnav header.top{top:calc(env(safe-area-inset-top,0px) + 52px)}
 /* hero */
 .hero{padding-block:44px 26px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:40px;align-items:center}
 .hero .kicker{font-size:.82rem;letter-spacing:.08em;color:var(--brass);font-weight:600;margin:0}
+@media(max-width:700px){.hero h1{font-size:clamp(1.5rem,7.2vw,2.6rem)!important;white-space:nowrap}}
 .hero h1{font-family:var(--f-display);font-weight:700;font-size:clamp(3rem,8vw,5.6rem);line-height:1.25;margin:6px 0 0;padding-top:.15em;text-wrap:balance;
   background:var(--gold-text);background-size:100% 200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s ease-in-out infinite alternate}
 @keyframes sheen{from{background-position:0 0}to{background-position:0 100%}}
@@ -1120,7 +1121,7 @@ html.spbg body>header.top,html.spbg body>div.wrap,html.spbg body>main,html.spbg 
       <button type="button" class="vpp" id="vpp" aria-label="تشغيل"><svg class="i-pl" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.6-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg><svg class="i-pa" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4.2" height="14" rx="1.2"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.2"/></svg></button>
       <button type="button" class="vskip" data-vskip="10" aria-label="تقديم ١٠ ثوانٍ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/><path d="M1 4v6h6"/></svg><span>١٠</span></button>
     </div>
-    <div class="vbot"><span class="vtime"><b id="vcur">0:00</b> / <span id="vdur">0:00</span></span><span class="sp"></span><button type="button" id="vspd" class="vspd" aria-label="سرعة التشغيل">١×</button><button type="button" id="vpip" aria-label="نافذة عائمة" title="نافذة عائمة: يكمل المقطع وأنت خارج الموقع" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><rect x="11.5" y="11.5" width="7" height="5" rx="1" fill="currentColor" stroke="none"/></svg></button><button type="button" id="vfs" aria-label="ملء الشاشة" title="ملء الشاشة"><svg class="i-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button></div>
+    <div class="vbot"><span class="vtime"><b id="vcur">0:00</b> / <span id="vdur">0:00</span></span><span class="sp"></span><button type="button" id="vspd" class="vspd" aria-label="سرعة التشغيل">١×</button><button type="button" id="vfs" aria-label="ملء الشاشة" title="ملء الشاشة"><svg class="i-in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="i-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button></div>
   </div>
   <div class="vseek" id="vseek" role="slider" aria-label="موضع المقطع" tabindex="0"><div class="vtrack"><i class="vbuf" id="vbuf"></i><i class="vplayed" id="vplayed"></i></div><i class="vthumb" id="vthumb"></i></div>
   <div class="vload" id="vload" hidden><span class="spin" aria-hidden="true"></span><b id="vloadT">جارٍ تحميل المقطع المرئي…</b><small id="vloadS"></small><div class="vlact" id="vlact" hidden><button type="button" class="pri" data-vl="audio">أكمل بالصوت</button><button type="button" data-vl="retry">حاول مرة ثانية</button></div></div></div>
@@ -1868,9 +1869,9 @@ const views = {
     const hero = `
     <section class="hero">
       <div>
-        <p class="kicker">رواية حفص عن عاصم</p>
-        <h1>ناصر القطامي</h1>
-        <p class="bio">ناصر بن علي بن ناصر القطامي، من مواليد الرياض. أمَّ المصلين في عدد من جوامع الرياض، منها جامع الملك عبدالله في حي الرحمانية، وعُرف بتراويحه المرتّلة الخاشعة. هنا تلاواته عبر السنين: ليالي رمضان ليلةً ليلة، وصلوات الفجر والمغرب والعشاء.</p>
+        
+        <h1>فضيلة الشيخ ناصر القطامي</h1>
+        <p class="bio">تلاوات مرتّلة للشيخ ناصر القطامي عبر السنين: ليالي رمضان ليلةً ليلة، وصلوات الفجر والمغرب والعشاء.</p>
       </div>
       ${portrait()}
     </section>
