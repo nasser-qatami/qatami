@@ -1204,7 +1204,7 @@ const BY_SURAH = (() => {
   const sn = s => s.replace(/[\u064B-\u065F\u0670\u0640]/g, "").replace(/[إأآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").replace(/[^\u0621-\u064A ]/g, " ").trim();
   const strip = s => s.replace(/^ال/, "");
   const NK = new Map(NAMES.map((x, i) => [strip(sn(x).replace(/\s+/g, "")), i + 1]));
-  const KEY = new Set(["سوره", "سورتا", "سورتي", "سور", "خواتيم", "فواتح", "مطلع", "تتمه", "اواخر", "اوائل", "اول", "اخر"]);
+  const KEY = new Set(["سوره", "سورتا", "سورتي", "سور", "خواتيم", "فواتح", "مطلع", "تتمه", "الليله", "ليله", "اواخر", "اوائل", "اول", "اخر"]);
   const find = text => {
     const toks = sn(text).split(/\s+/).filter(Boolean), out = []; let on = false;
     for (let i = 0; i < toks.length; i++) {
