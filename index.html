@@ -1324,13 +1324,13 @@ function trackRow(r, ctx) {
   if (isDone) sub.push(`<span class="done">✓ استمعت</span>`);
   if (offSaved(r)) sub.push(`<span class="done">⤓ محمّلة</span>`);
   const prog = r.d && pos[r.key] > 5 && !isDone ? Math.min(1, pos[r.key] / r.d) : isDone ? 1 : 0;
-  const moonN = r.cat === "ramadan" && r.night && !at && !extMode ? Math.min(30, r.night) : 0;
+  const moonN = r.cat === "ramadan" && r.night && !extMode ? Math.min(30, r.night) : 0;
   const wmN = r.surah || (r.cat === "ramadan" && r.night) || 0;
   const wm = `<span class="twm" aria-hidden="true"><svg viewBox="0 0 120 120"><g fill="none" stroke="currentColor"><rect x="27" y="27" width="66" height="66" stroke-width="1.6"/><rect x="27" y="27" width="66" height="66" transform="rotate(45 60 60)" stroke-width="1.6"/><circle cx="60" cy="60" r="27" stroke-width="1"/><circle cx="60" cy="60" r="52" stroke-width=".7" stroke-dasharray="2 4"/><rect x="38" y="38" width="44" height="44" transform="rotate(22.5 60 60)" stroke-width=".8"/></g></svg>${wmN ? `<b>${AR(wmN)}</b>` : ""}</span>`;
   return `<li class="${playing ? "playing" : ""}${isDone ? " heard" : ""}${moonN ? " moon" : ""}" data-key="${esc(r.key)}">${moonN ? "" : wm}${prog && !moonN ? `<i class="tprog" style="--p:${prog.toFixed(3)}" aria-hidden="true"></i>` : ""}
     ${extMode ? `<a class="pbtn" href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="استمع إلى ${esc(r.title)} في تبويب جديد">${icon("i-play")}</a>`
-      : at ? `<button class="pbtn" data-mkgo="${esc(r.key)}" data-t="${at}" aria-label="تشغيل من ${fmt(at)}">${icon("i-play")}</button>`
-      : moonN ? `<button class="pbtn" data-play="${esc(r.key)}" aria-label="تشغيل ${esc(r.title)}">${moonSvg(moonN)}${prog ? `<svg class="rg" viewBox="0 0 66 66" aria-hidden="true"><circle cx="33" cy="33" r="31.5"/><circle cx="33" cy="33" r="31.5" stroke-dasharray="${(prog * 197.9).toFixed(0)} 300"/></svg>` : ""}<span class="bd">${icon(playing && !audio.paused ? "i-pause" : "i-play")}</span></button>`
+      : at && !moonN ? `<button class="pbtn" data-mkgo="${esc(r.key)}" data-t="${at}" aria-label="تشغيل من ${fmt(at)}">${icon("i-play")}</button>`
+      : moonN ? `<button class="pbtn" ${at ? `data-mkgo="${esc(r.key)}" data-t="${at}"` : `data-play="${esc(r.key)}"`} aria-label="تشغيل ${esc(r.title)}">${moonSvg(moonN)}${prog ? `<svg class="rg" viewBox="0 0 66 66" aria-hidden="true"><circle cx="33" cy="33" r="31.5"/><circle cx="33" cy="33" r="31.5" stroke-dasharray="${(prog * 197.9).toFixed(0)} 300"/></svg>` : ""}<span class="bd">${icon(playing && !audio.paused ? "i-pause" : "i-play")}</span></button>`
       : `<button class="pbtn" data-play="${esc(r.key)}" aria-label="تشغيل ${esc(r.title)}">${icon(playing && !audio.paused ? "i-pause" : "i-play")}</button>`}
     <div class="info"><span class="ttl ${isSurahTitle ? "" : "long"}">${esc(r.title)}</span>
       <span class="sub">${sub.join(" · ")}</span></div>
