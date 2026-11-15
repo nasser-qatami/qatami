@@ -262,14 +262,31 @@ async function api(path, tries = 4) {
   if (!r.ok) throw new Error("http " + r.status);
   try { return await r.json(); } catch { throw new Error("json"); }
 }
-async function allHits(q) {
+/* The service refuses very long addresses (about 330 excluded paths). One day at a time stays far below that,
+   so the range is fetched day by day and merged; finished days are remembered while the page is open. */
+const DAYC = new Map();
+async function pageHits(q) {
   let out = [], ex = [];
   for (let i = 0; i < 12; i++) {
     const d = await api("stats/hits?limit=100&" + q + ex.map(id => "&exclude_paths=" + id).join(""));
-    out = out.concat(d.hits || []); if (!d.more || !(d.hits || []).length) break;
+    out = out.concat(d.hits || []); if (!d.more || !(d.hits || []).length || out.length > 300) break;
     ex = out.map(h => h.path_id);
   }
   return out;
+}
+async function allHits(q) {
+  const m = /start=([^&]+)&end=([^&]+)/.exec(q), s0 = new Date(m[1]), e0 = new Date(m[2]), merged = new Map(), nowT = Date.now();
+  for (let d = s0, k = 0; d <= e0 && k < 120; d = addDays(d, 1), k++) {
+    const cs = iso(d), ce = addDays(d, 1) > e0 ? m[2] : iso(d, 1), key = cs + ce, fin = new Date(ce).getTime() < nowT - 36e5;
+    let hits = DAYC.get(key);
+    if (!hits) { hits = await pageHits(`start=${cs}&end=${ce}`); if (fin) DAYC.set(key, hits); }
+    for (const h of hits) {
+      const o = merged.get(h.path_id);
+      if (!o) merged.set(h.path_id, { ...h, stats: [...(h.stats || [])] });
+      else { o.count = (o.count || 0) + (h.count || 0); o.stats.push(...(h.stats || [])); o.max = Math.max(o.max || 0, h.max || 0); }
+    }
+  }
+  return [...merged.values()];
 }
 /* minutes are sent as steps of each device's running total: 1,2,3,5,10,15,20,30,45,60 then every 30 */
 const STEPS = [1, 2, 3, 5, 10, 15, 20, 30, 45, 60];
