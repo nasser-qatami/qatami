@@ -1031,6 +1031,27 @@ html.spbg body>header.top,html.spbg body>div.wrap,html.spbg body>main,html.spbg 
 .newsd .more em{font-style:normal;font-weight:700;color:#E3C36A}
 @media (prefers-reduced-motion:reduce){.newsd::after,.newsd .k svg,.newb{animation:none}}
 
+
+.kx-seal{display:flex;align-items:center;gap:14px;margin:18px 2px 2px;padding:14px 14px;border-radius:20px;border:1px solid rgba(227,195,106,.25);background:linear-gradient(135deg,rgba(227,195,106,.08),rgba(227,195,106,.02))}
+.kx-seal .sg{flex:none;width:62px;height:62px;color:rgba(227,195,106,.55)}
+.kx-seal .sg svg{width:100%;height:100%;overflow:visible}
+.kx-seal .ck{stroke:rgba(227,195,106,.25)}
+.kx-seal.done{border-color:rgba(227,195,106,.6);background:radial-gradient(120% 140% at 100% 50%,rgba(227,195,106,.22),rgba(227,195,106,.04) 70%)}
+.kx-seal.done .sg{color:#E3C36A;filter:drop-shadow(0 0 10px rgba(255,226,140,.45))}
+.kx-seal.done .sg path:first-child{fill:url(#kxSealG)}
+.kx-seal.done .ck{stroke:#1E150A}
+.kx-seal.pop .sg{animation:kxpop .9s cubic-bezier(.3,1.6,.5,1)}@keyframes kxpop{0%{transform:scale(.4) rotate(-30deg);opacity:0}100%{transform:none;opacity:1}}
+.kx-seal .tx{min-width:0;display:grid;gap:2px}
+.kx-seal b{font-family:var(--f-display);font-size:1.12rem;line-height:1.5;color:#F3E6C4}
+.kx-seal.done b{background:linear-gradient(180deg,#FFF3C9,#E3C36A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kx-seal .tx>span{font-size:.76rem;color:#BFA77A}
+.kx-seal .wk{display:flex;align-items:center;gap:6px;margin-top:6px;font-style:normal}
+.kx-seal .wk em{width:9px;height:9px;transform:rotate(45deg);border:1px solid rgba(227,195,106,.5)}
+.kx-seal .wk em.y{background:#E3C36A;border-color:#E3C36A;box-shadow:0 0 6px rgba(255,226,140,.6)}
+.kx-seal .wk em.c{outline:1px solid rgba(227,195,106,.35);outline-offset:3px}
+.kx-seal .wk small{margin-inline-start:6px;font-size:.66rem;color:#9C865C}
+@media (prefers-reduced-motion:reduce){.kx-seal.pop .sg{animation:none}}
+
 /* Friday · al-Kahf */
 @keyframes kxspin{to{transform:rotate(360deg)}}@keyframes kxbreath{50%{opacity:.75;transform:scale(1.08)}}
 .kahfx{position:relative;isolation:isolate;overflow:hidden;margin:22px 0 10px;padding:26px 20px 20px;border-radius:30px;color:#F3E6C4;border:1px solid #B8913A;
@@ -1695,7 +1716,25 @@ function kahfGo(i) {
   audio.addEventListener("loadedmetadata", function once() { audio.removeEventListener("loadedmetadata", once); if (p.from > 1) audio.currentTime = p.from; q.busy = false; }, { once: true });
   if (i > 0) toast("نكمل سورة الكهف من الليلة " + AR(p.r.night));
 }
-function kahfDone() { if (!isKahfDay()) return; const k = typeof kahfFriKey === "function" ? kahfFriKey() : new Date().toISOString().slice(0, 10), w = store.get("kahfw", []); if (!w.includes(k)) { w.push(k); store.set("kahfw", w.slice(-60)); } }
+function kahfFriKey() { const d = new Date(); if (d.getDay() === 4) d.setDate(d.getDate() + 1); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function kahfWeeks(n) {   /* the last n Fridays, oldest first: [{k, done}] */
+  const done = new Set(store.get("kahfw", [])), d = new Date(kahfFriKey() + "T12:00:00"), out = [];
+  for (let i = n - 1; i >= 0; i--) { const x = new Date(d); x.setDate(d.getDate() - 7 * i); const k = x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0") + "-" + String(x.getDate()).padStart(2, "0"); out.push({ k, done: done.has(k) }); }
+  return out;
+}
+function kahfStreak() { const w = kahfWeeks(60); let n = 0, i = w.length - 1; if (!w[i].done) i--; for (; i >= 0 && w[i].done; i--) n++; return n; }
+function kahfSeal() {
+  const w = kahfWeeks(5), now = w[w.length - 1].done, st = kahfStreak();
+  return `<div class="kx-seal${now ? " done" : ""}" id="kxSeal">
+    <div class="sg"><svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor"><path d="M32 3l5 6 7.6-2.4 1.6 7.8 7.8 1.6L51.6 23.6 58 29l-6 5 2.4 7.6-7.8 1.6-1.6 7.8L37.4 48.6 32 55l-5-6-7.6 2.4-1.6-7.8-7.8-1.6L12.4 34.4 6 29l6-5-2.4-7.6 7.8-1.6 1.6-7.8L26.6 9.4z" stroke-width="1.4"/><circle cx="32" cy="29" r="15" stroke-width=".8" stroke-dasharray="${now ? "0" : "2 3"}"/></g>
+      <path class="ck" d="M24.5 29.5l5 5 10-10.5" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="tx"><b>${now ? "أتممت الكهف هذه الجمعة" : "لم تُتمّها بعد هذه الجمعة"}</b>
+      <span>${now ? (st > 1 ? `${AR(st)} جُمَع متتالية، ثبّتك الله` : "نوّر الله لك ما بين الجمعتين") : "تُحسب لك إذا استمعت إلى السورة كاملة"}</span>
+      <i class="wk" aria-label="آخر خمس جُمَع">${w.map((x, i) => `<em class="${x.done ? "y" : ""}${i === w.length - 1 ? " c" : ""}"></em>`).join("")}<small>آخر ٥ جُمَع</small></i></div>
+  </div>`;
+}
+function kahfDone() { if (!isKahfDay()) return; const k = kahfFriKey(), w = store.get("kahfw", []); if (w.includes(k)) return; w.push(k); store.set("kahfw", w.slice(-60));
+  const el = document.getElementById("kxSeal"); if (el) { el.outerHTML = kahfSeal(); document.getElementById("kxSeal").classList.add("pop"); } }
 function kahfWatch() {
   const q = kahfSeq; if (!q || q.busy || !player.cur) return;
   const j = q.it.parts.findIndex(x => x.r.key === player.cur.key); if (j < 0) { kahfSeq = null; return; }
@@ -1710,7 +1749,7 @@ function kahfRail() {
   KAHF_IT = new Map(list.map(x => [x.r.key, x])); lastKahf = list.map(x => x.r); if (!list.length) return "";
   const fri = new Date().getDay() === 5, top = list[0];
   return `<section class="kahfx">
-    <svg class="kx-lat" aria-hidden="true"><defs><pattern id="kxlat" width="44" height="44" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width=".7"><rect x="12" y="12" width="20" height="20"/><rect x="12" y="12" width="20" height="20" transform="rotate(45 22 22)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#kxlat)"/></svg>
+    <svg class="kx-lat" aria-hidden="true"><defs><linearGradient id="kxSealG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0BF"/><stop offset=".45" stop-color="#E3C36A"/><stop offset="1" stop-color="#9C7428"/></linearGradient><pattern id="kxlat" width="44" height="44" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width=".7"><rect x="12" y="12" width="20" height="20"/><rect x="12" y="12" width="20" height="20" transform="rotate(45 22 22)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#kxlat)"/></svg>
     <div class="kx-glow" aria-hidden="true"></div>
     <svg class="kx-rays" viewBox="0 0 200 200" aria-hidden="true"><g stroke="currentColor" stroke-width=".6">${Array.from({ length: 24 }, (_, i) => `<line x1="100" y1="100" x2="${100 + 98 * Math.cos(i * Math.PI / 12)}" y2="${100 + 98 * Math.sin(i * Math.PI / 12)}"/>`).join("")}</g></svg>
     <div class="kx-head">
@@ -1729,6 +1768,7 @@ function kahfRail() {
     <div class="kx-sub"><span>تلاوات الكهف عبر السنين</span><b>${AR(list.length)}</b></div>
     <div class="kx-rail">${list.slice(1).map(x => { const { r, at } = x; return `<button class="kx-c${player.cur && player.cur.key === r.key ? " on" : ""}" type="button" data-kf="${esc(r.key)}" data-at="${at}" aria-label="تشغيل سورة الكهف ${r.year ? AR(r.year) : ""}">
       <span class="y">${r.year ? AR(r.year) : "—"}</span><span class="tt">${kahfLabel(x)}</span><span class="dd">${x.len ? fmt(x.len) : "&nbsp;"}</span></button>`; }).join("")}</div>
+    ${kahfSeal()}
   </section>`;
 }
 function kahfPlay(it) {
