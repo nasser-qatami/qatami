@@ -1743,11 +1743,28 @@ function kahfWatch() {
   if (j + 1 < q.it.parts.length) kahfGo(j + 1); else { audio.pause(); kahfSeq = null; kahfDone(); toast("تمّت سورة الكهف"); }
 }
 setTimeout(() => { audio.addEventListener("timeupdate", kahfWatch); audio.addEventListener("ended", () => { if (kahfSeq && kahfSeq.i === kahfSeq.it.parts.length - 1) { kahfSeq = null; kahfDone(); } }); });   /* audio is declared further down */
+async function kahfStatsRefresh() {
+  if (!isKahfDay()) return;
+  const c = store.get("ktop", null); if (c && Date.now() - c.t < TOPSTAT.ttl) return;
+  try {
+    const iso = d => d.toISOString().slice(0, 19) + "Z", keys = new Set(BY_SURAH[17].map(r => r.key)), cnt = {}, ex = [];
+    for (let i = 0; i < 10; i++) {
+      const r = await fetch(`https://qatami.goatcounter.com/api/v0/stats/hits?limit=100&start=2025-01-01T00:00:00Z&end=${iso(new Date())}${ex.length ? "&exclude_paths=" + ex.join(",") : ""}`, { headers: { Authorization: "Bearer " + TOPSTAT.token, "Content-Type": "application/json" } });
+      if (!r.ok) throw 0;
+      const j = await r.json(), hs = j.hits || [];
+      for (const h of hs) { ex.push(h.path_id); if (h.event && h.path.startsWith("play/") && keys.has(h.path.slice(5))) cnt[h.path.slice(5)] = h.count; }
+      if (!j.more || !hs.length) break;
+    }
+    store.set("ktop", { t: Date.now(), c: cnt });
+    const el = document.querySelector(".kahfx"); if (el && !(player.cur && el.querySelector(".kx-c.on"))) el.outerHTML = kahfRail();
+  } catch { store.set("ktop", { t: Date.now() - TOPSTAT.ttl + 30 * 60e3, c: (c && c.c) || {} }); }
+}
 function kahfRail() {
   if (!isKahfDay()) return "";
   const list = kahfItems().slice(0, 30);
   KAHF_IT = new Map(list.map(x => [x.r.key, x])); lastKahf = list.map(x => x.r); if (!list.length) return "";
-  const fri = new Date().getDay() === 5, top = list.find(x => x.full) || list[0];
+  const fri = new Date().getDay() === 5, pl = (store.get("ktop", null) || {}).c || {}, sc = x => x.parts.reduce((n, p) => n + (pl[p.r.key] || 0), 0),
+    best = list.reduce((m, x) => sc(x) > sc(m) ? x : m, list[0]), pop = sc(best) > 0, top = pop ? best : (list.find(x => x.full) || list[0]);
   return `<section class="kahfx">
     <svg class="kx-lat" aria-hidden="true"><defs><linearGradient id="kxSealG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0BF"/><stop offset=".45" stop-color="#E3C36A"/><stop offset="1" stop-color="#9C7428"/></linearGradient><pattern id="kxlat" width="44" height="44" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width=".7"><rect x="12" y="12" width="20" height="20"/><rect x="12" y="12" width="20" height="20" transform="rotate(45 22 22)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#kxlat)"/></svg>
     <div class="kx-glow" aria-hidden="true"></div>
@@ -1764,7 +1781,7 @@ function kahfRail() {
         <small>رواه الحاكم والبيهقي، وصححه الألباني</small>
       </div>
     </div>
-    <button class="kx-main" type="button" data-kf="${esc(top.r.key)}" data-at="${top.at}"><span class="pb">${icon("i-play")}</span><span><b>استمع لسورة الكهف كاملة</b><em>رمضان ${top.r.year ? AR(top.r.year) + "هـ" : ""} · ${fmt(top.len || top.r.d || 0)}</em></span></button>
+    <button class="kx-main" type="button" data-kf="${esc(top.r.key)}" data-at="${top.at}"><span class="pb">${icon("i-play")}</span><span><b>${pop ? "الأكثر استماعًا من تلاوات الكهف" : "استمع لسورة الكهف كاملة"}</b><em>رمضان ${top.r.year ? AR(top.r.year) + "هـ" : ""}${pop ? " · " + kahfLabel(top) : ""} · ${fmt(top.len || top.r.d || 0)}</em></span></button>
     <div class="kx-sub"><span>تلاوات الكهف عبر السنين</span><b>${AR(list.length)}</b></div>
     <div class="kx-rail">${list.map(x => { const { r, at } = x; return `<button class="kx-c${player.cur && player.cur.key === r.key ? " on" : ""}" type="button" data-kf="${esc(r.key)}" data-at="${at}" aria-label="تشغيل سورة الكهف ${r.year ? AR(r.year) : ""}">
       <span class="y">${r.year ? AR(r.year) : "—"}</span><span class="tt">${kahfLabel(x)}</span><span class="dd">${x.len ? fmt(x.len) : "&nbsp;"}</span></button>`; }).join("")}</div>
@@ -3457,7 +3474,7 @@ $("#cardShare").onclick = async () => { const b = await cardBlob(); if (!b) retu
 
 /* boot */
 route();
-setTimeout(topRefresh, 2500);
+setTimeout(topRefresh, 2500); setTimeout(kahfStatsRefresh, 3500);
 const last = store.get("last", null), lr = last && BY_KEY.get(last.key);
 if (lr) { setQueue(lr.c.tracks.map(t => BY_KEY.get(lr.c.id + ":" + t.id)), lr.key); player.cur = lr;
   $("#nowTitle").textContent = lr.title; $("#nowSub").textContent = lr.c.title + (pos[lr.key] > 5 ? " · توقفت عند " + fmt(pos[lr.key]) : "");
