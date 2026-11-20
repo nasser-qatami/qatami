@@ -67,6 +67,20 @@ header.top{transition:transform .28s ease}
 header.top.hide{transform:translateY(calc(-100% - 12px))}
 header.top::after{content:"";position:absolute;inset:auto 0 -1px;height:1px;background:linear-gradient(90deg,transparent,var(--line-strong),transparent);opacity:.7}
 .top .wrap{display:flex;align-items:center;gap:18px;padding-block:10px;flex-wrap:wrap}
+@media (min-width:761px) and (max-width:1179px){   /* tablet: row 1 = logo + search + buttons, row 2 = tabs */
+  .search{order:1;flex:1 1 200px;max-width:none}
+  #themeBtn,#tourBtn{order:2}
+  #themeBtn{margin-inline-start:0}
+  nav.tabs{order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  nav.tabs::-webkit-scrollbar{display:none}
+}
+@media (min-width:1180px){   /* desktop: keep logo, tabs, search and buttons on ONE row */
+  .top .wrap{max-width:1480px;gap:10px;flex-wrap:nowrap}
+  nav.tabs{flex-wrap:nowrap;flex:none}
+  nav.tabs a{padding:7px 10px;font-size:.88rem}
+  .search{flex:1 1 120px;min-width:110px;margin-inline-start:auto}
+  .brand{flex:none}
+}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
 .brand .logo{width:56px;height:56px;flex:none;border-radius:50%;box-shadow:0 0 0 1.5px #C9A24B,0 0 0 4px color-mix(in srgb,var(--surface) 80%,transparent);filter:drop-shadow(0 3px 8px rgba(110,79,20,.28))}
 .brand .bt{display:flex;flex-direction:column;line-height:1.2}
