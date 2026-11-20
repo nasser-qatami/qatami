@@ -1670,13 +1670,44 @@ function isKahfDay() {
   if (/[?&]demo-kahf/.test(location.search)) return true;
   const d = new Date(), w = d.getDay(); return w === 5 || (w === 4 && d.getHours() >= 18);
 }
+let KAHF_IT = new Map(), kahfSeq = null;
+/* the part of a recording that is al-Kahf: from its surah index when there is one */
+function kahfSeg(r) {
+  const ix = r.t.idx ? r.t.idx.findIndex(e => /الكهف/.test(e[1])) : -1;
+  if (ix < 0) return { r, from: SURAH_AT.get("18|" + r.key) || 0, to: null, cont: false, whole: r.surah === 18 || /الكهف\s*كامل/.test(r.title) };
+  const e = r.t.idx[ix], cont = /^تتمة/.test(e[1]);
+  return { r, from: e[0], to: r.t.idx[ix + 1] ? r.t.idx[ix + 1][0] : null, cont, whole: !cont && /^سورة الكهف$/.test(e[1]) };
+}
+/* one item per recitation of al-Kahf; a surah split over two nights becomes ONE item that plays both parts back to back */
+function kahfItems() {
+  const segs = BY_SURAH[17].filter(r => r.url && !r.yt).map(kahfSeg), next = new Map(), taken = new Set();
+  for (const s of segs) if (s.r.night && !s.cont) { const n = segs.find(o => o.cont && o.r.c.id === s.r.c.id && o.r.night === s.r.night + 1); if (n) { next.set(s.r.key, n); taken.add(n.r.key); } }
+  return segs.filter(s => !taken.has(s.r.key)).map(s => {
+    const parts = next.has(s.r.key) ? [s, next.get(s.r.key)] : [s];
+    const len = parts.reduce((a, p) => a + Math.max(0, (p.to ?? p.r.d ?? 0) - p.from), 0);
+    return { r: s.r, parts, at: s.from, len, two: parts.length > 1, full: parts.length > 1 || (s.whole && !next.has(s.r.key)) };
+  }).sort((a, b) => (b.full - a.full) || ((b.r.surah === 18) - (a.r.surah === 18)) || (b.r.year || 0) - (a.r.year || 0));
+}
+const kahfLabel = x => x.two ? `الليلتان ${AR(x.r.night)}–${AR(x.r.night + 1)}` : x.full ? (x.r.night ? "كاملة · الليلة " + AR(x.r.night) : "كاملة") : x.r.night ? "الليلة " + AR(x.r.night) : "مقطع";
+function kahfGo(i) {
+  const q = kahfSeq, p = q.it.parts[i]; q.i = i; q.busy = true;
+  setQueue(q.it.parts.map(x => x.r), p.r.key); load(p.r);
+  audio.addEventListener("loadedmetadata", function once() { audio.removeEventListener("loadedmetadata", once); if (p.from > 1) audio.currentTime = p.from; q.busy = false; }, { once: true });
+  if (i > 0) toast("نكمل سورة الكهف من الليلة " + AR(p.r.night));
+}
+function kahfDone() { if (!isKahfDay()) return; const k = typeof kahfFriKey === "function" ? kahfFriKey() : new Date().toISOString().slice(0, 10), w = store.get("kahfw", []); if (!w.includes(k)) { w.push(k); store.set("kahfw", w.slice(-60)); } }
+function kahfWatch() {
+  const q = kahfSeq; if (!q || q.busy || !player.cur) return;
+  const j = q.it.parts.findIndex(x => x.r.key === player.cur.key); if (j < 0) { kahfSeq = null; return; }
+  if (j !== q.i) { q.i = j; const f = q.it.parts[j].from; if (f > 1 && audio.currentTime < f - 1) audio.currentTime = f; return; }   /* the queue moved on by itself */
+  const p = q.it.parts[j]; if (!p.to || audio.currentTime < p.to) return;
+  if (j + 1 < q.it.parts.length) kahfGo(j + 1); else { audio.pause(); kahfSeq = null; kahfDone(); toast("تمّت سورة الكهف"); }
+}
+setTimeout(() => { audio.addEventListener("timeupdate", kahfWatch); audio.addEventListener("ended", () => { if (kahfSeq && kahfSeq.i === kahfSeq.it.parts.length - 1) { kahfSeq = null; kahfDone(); } }); });   /* audio is declared further down */
 function kahfRail() {
   if (!isKahfDay()) return "";
-  const at = r => SURAH_AT.get("18|" + r.key) || 0;
-  const list = BY_SURAH[17].filter(r => r.url && !r.yt)
-    .map(r => ({ r, full: r.surah === 18 || /الكهف\s*كامل/.test(r.title), at: at(r) }))
-    .sort((a, b) => b.full - a.full || (b.r.year || 0) - (a.r.year || 0)).slice(0, 14);
-  lastKahf = list.map(x => x.r); if (!list.length) return "";
+  const list = kahfItems().slice(0, 14);
+  KAHF_IT = new Map(list.map(x => [x.r.key, x])); lastKahf = list.map(x => x.r); if (!list.length) return "";
   const fri = new Date().getDay() === 5, top = list[0];
   return `<section class="kahfx">
     <svg class="kx-lat" aria-hidden="true"><defs><pattern id="kxlat" width="44" height="44" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width=".7"><rect x="12" y="12" width="20" height="20"/><rect x="12" y="12" width="20" height="20" transform="rotate(45 22 22)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#kxlat)"/></svg>
@@ -1694,15 +1725,16 @@ function kahfRail() {
         <small>رواه الحاكم والبيهقي، وصححه الألباني</small>
       </div>
     </div>
-    <button class="kx-main" type="button" data-kf="${esc(top.r.key)}" data-at="${top.at}"><span class="pb">${icon("i-play")}</span><span><b>استمع لسورة الكهف كاملة</b><em>رمضان ${top.r.year ? AR(top.r.year) + "هـ" : ""} · ${top.r.d ? fmt(top.r.d) : ""}</em></span></button>
+    <button class="kx-main" type="button" data-kf="${esc(top.r.key)}" data-at="${top.at}"><span class="pb">${icon("i-play")}</span><span><b>استمع لسورة الكهف كاملة</b><em>رمضان ${top.r.year ? AR(top.r.year) + "هـ" : ""} · ${fmt(top.len || top.r.d || 0)}</em></span></button>
     <div class="kx-sub"><span>تلاوات الكهف عبر السنين</span><b>${AR(list.length)}</b></div>
-    <div class="kx-rail">${list.slice(1).map(({ r, full, at }) => `<button class="kx-c${player.cur && player.cur.key === r.key ? " on" : ""}" type="button" data-kf="${esc(r.key)}" data-at="${at}" aria-label="تشغيل سورة الكهف ${r.year ? AR(r.year) : ""}">
-      <span class="y">${r.year ? AR(r.year) : "—"}</span><span class="tt">${full ? "كاملة" : r.night ? "الليلة " + AR(r.night) : "مقطع"}</span><span class="dd">${at ? "من " + fmt(at) : r.d ? fmt(r.d) : "&nbsp;"}</span></button>`).join("")}</div>
+    <div class="kx-rail">${list.slice(1).map(x => { const { r, at } = x; return `<button class="kx-c${player.cur && player.cur.key === r.key ? " on" : ""}" type="button" data-kf="${esc(r.key)}" data-at="${at}" aria-label="تشغيل سورة الكهف ${r.year ? AR(r.year) : ""}">
+      <span class="y">${r.year ? AR(r.year) : "—"}</span><span class="tt">${kahfLabel(x)}</span><span class="dd">${x.len ? fmt(x.len) : "&nbsp;"}</span></button>`; }).join("")}</div>
   </section>`;
 }
-function kahfPlay(r, at) {
-  setQueue(lastKahf, r.key); load(r);
-  if (at > 5) audio.addEventListener("loadedmetadata", function once() { audio.removeEventListener("loadedmetadata", once); if (audio.currentTime < 2) audio.currentTime = at; }, { once: true });
+function kahfPlay(it) {
+  if (!it) return;
+  if (player.cur && it.parts.some(p => p.r.key === player.cur.key)) { audio.paused ? audio.play().catch(() => {}) : audio.pause(); return; }
+  kahfSeq = { it, i: 0 }; kahfGo(0);
 }
 function tonightRail() {
   const n = ramadanNight(); if (!n) return "";
@@ -3311,7 +3343,7 @@ addEventListener("keydown", e => {
 /* delegated clicks */
 document.addEventListener("click", async e => {
   const kf = e.target.closest("[data-kf]");
-  if (kf) { const r = BY_KEY.get(kf.dataset.kf); if (r) { kahfPlay(r, +kf.dataset.at || 0); document.querySelectorAll(".kahfx [data-kf]").forEach(x => x.classList.toggle("on", x === kf)); } return; }
+  if (kf) { const it = KAHF_IT.get(kf.dataset.kf); if (it) { kahfPlay(it); document.querySelectorAll(".kahfx [data-kf]").forEach(x => x.classList.toggle("on", x === kf)); } return; }
   if (e.target.closest("[data-kfall]")) { const b = document.querySelector(".kahfx .kx-main"); if (b) b.click(); return; }
   const tn = e.target.closest("[data-tn]");
   if (tn) { const r = BY_KEY.get(tn.dataset.tn); if (r) { setQueue(lastTonight, r.key); load(r); document.querySelectorAll(".tn").forEach(x => x.classList.toggle("on", x === tn)); } return; }
