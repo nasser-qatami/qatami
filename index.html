@@ -1104,6 +1104,36 @@ html.spbg body>header.top,html.spbg body>div.wrap,html.spbg body>main,html.spbg 
 @font-face{font-family:"KFGQPC";font-display:swap;src:url(fonts/hafs.otf) format("opentype")}
 .hero .ayah,.portrait .cap q{font-family:"KFGQPC","Amiri",serif!important}
 </style>
+<style>
+.pfil{display:flex;gap:6px;margin:0 0 16px;padding:4px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.pfil button{flex:1;justify-content:center;display:inline-flex;align-items:center;gap:6px;padding:8px 6px;border:0!important;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;font-size:.92rem;font-weight:600;cursor:pointer}
+.pfil button span{font-size:.74rem;color:var(--muted);font-weight:500}
+.pfil button[aria-pressed="true"]{background:linear-gradient(135deg,#C9A24B,#8F6A22);border-color:transparent;color:#FFFDF6;box-shadow:0 4px 12px rgba(110,79,20,.25)}
+.pfil button[aria-pressed="true"] span{color:#FFF1CC}
+ol.tracks.fyl{gap:0;background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 10px 24px -20px rgba(90,62,14,.6)}
+ol.tracks.fyl li.fy{position:relative;gap:12px;padding:10px 12px 10px 6px;border:0;border-radius:0;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent);background:none;box-shadow:none}
+ol.tracks.fyl li.fy:first-child{border-top:0}
+ol.tracks.fyl li.fy::before{display:none}
+ol.tracks.fyl li.fy.playing{background:var(--gold-soft)}
+.fday{flex:none;position:relative;width:52px;height:56px;border-radius:14px;border:1px solid color-mix(in srgb,var(--line-strong) 75%,transparent);background:linear-gradient(180deg,var(--surface),var(--gold-soft));box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 6px 12px -10px rgba(90,62,14,.7);display:grid;place-content:center;gap:1px;text-align:center;cursor:pointer;color:var(--ink);font:inherit;padding:0}
+.fday b{font-family:var(--f-display);font-size:1.32rem;line-height:1.05;color:var(--brass)}
+.fday small{font-size:.68rem;color:var(--muted);line-height:1.2}
+.fday .pi{position:absolute;inset:0;border-radius:inherit;display:grid;place-items:center;background:var(--gold);color:#FFFDF6;opacity:0;transition:opacity .15s}
+.fday .pi svg{width:16px;height:16px}
+.fday:hover .pi,li.fy.playing .fday .pi{opacity:1}
+li.fy .ttl.long{font-size:1.02rem!important;line-height:1.5!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+li.fy .sub{margin-top:1px}
+li.fy[hidden],.fysec [hidden]{display:none!important}
+.fym{margin:0 0 26px}
+.fmh{display:flex;align-items:center;gap:10px;margin:0 4px 12px;font-weight:400}
+.fmh::before{content:"";flex:none;width:8px;height:8px;rotate:45deg;background:linear-gradient(135deg,#E3C36A,#9C7428);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 18%,transparent)}
+.fmh b{font-family:var(--f-quran);font-size:1.42rem;font-weight:700;line-height:1.3;color:var(--ink)}
+.fmh small{font-size:.78rem;color:var(--muted);margin-top:4px}
+.fmh i{flex:1;height:1px;background:linear-gradient(270deg,var(--line-strong),transparent);opacity:.8;margin-top:3px}
+.fmh .mc{flex:none;font-size:.74rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:var(--surface)}.fmh .mc em{font-style:normal;font-weight:700;color:var(--brass)}
+.fym ol.tracks.fyl{position:relative;border:1px solid var(--line);border-radius:20px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 14px 28px -22px rgba(90,62,14,.6);background:var(--surface)}
+.fym ol.tracks.fyl::before{content:"";position:absolute;inset:0 18% auto;height:1px;background:linear-gradient(90deg,transparent,#D9B65E,transparent);opacity:.8;z-index:1}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1409,6 +1439,16 @@ function moonSvg(n) {
     <circle class="dk" r="${R}" stroke-width=".6"/><path d="M0,${-R} A${R},${R} 0 0 1 0,${R} A${rx},${R} 0 0 ${k < .5 ? 0 : 1} 0,${-R}Z" fill="url(#mg${n})"${n <= 15 ? "" : ' transform="scale(-1,1)"'}/>
     <g fill="rgba(143,106,34,.13)"><circle cx="9" cy="-8" r="4"/><circle cx="14" cy="8" r="2.6"/><circle cx="4" cy="13" r="2"/></g></svg>`;
 }
+/* fard year list: shorter titles (the prayer, day and sheikh's name are shown elsewhere) */
+function fardTitle(t) {
+  const x = String(t).replace(/\s*[-–]\s*(السبت|الأحد|الاحد|الاثنين|الإثنين|الثلاثاء|الأربعاء|الاربعاء|الخميس|الجمعة)\s*$/, "")
+    .replace(/(من|في)?\s*(صلاة|عشاء|فجر|مغرب)\s*(ال)?(فجر|عشاء|مغرب)?\s*(يوم)?\s*$/, "")
+    .replace(/(بصوت\s*|من\s*(عشائية|فجرية)\s*)?(لفضيلة\s*)?(للشيخ|الشيخ)\s*ناصر\s*القطا(مي)?/g, "").replace(/ماتيسر/g, "ما تيسر")
+    .replace(/صلاة\s*(ال)?(فجر|عشاء|مغرب)/g, "").replace(/^فروض\s*[0-9٠-٩]+\s*/, "")
+    .replace(/\s{2,}/g, " ").replace(/^[\s\-–،]+|[\s\-–،]+$/g, "");
+  return x.length > 3 ? x : t;
+}
+let FARD_PF = "";
 function trackRow(r, ctx) {
   const playing = player.cur && player.cur.key === r.key;
   const isFav = favs.has(r.key), isDone = done.has(r.key);
@@ -1432,6 +1472,7 @@ function trackRow(r, ctx) {
   const prog = r.d && pos[r.key] > 5 && !isDone ? Math.min(1, pos[r.key] / r.d) : isDone ? 1 : 0;
   const moonN = r.cat === "ramadan" && r.night && !extMode ? Math.min(30, r.night) : 0;
   const wmN = r.surah || (r.cat === "ramadan" && r.night) || 0;
+  if (ctx === "fy") return fardRow(r, playing, isFav, isDone, prog);
   const wm = `<span class="twm" aria-hidden="true"><svg viewBox="0 0 120 120"><g fill="none" stroke="currentColor"><rect x="27" y="27" width="66" height="66" stroke-width="1.6"/><rect x="27" y="27" width="66" height="66" transform="rotate(45 60 60)" stroke-width="1.6"/><circle cx="60" cy="60" r="27" stroke-width="1"/><circle cx="60" cy="60" r="52" stroke-width=".7" stroke-dasharray="2 4"/><rect x="38" y="38" width="44" height="44" transform="rotate(22.5 60 60)" stroke-width=".8"/></g></svg>${wmN ? `<b>${AR(wmN)}</b>` : ""}</span>`;
   return `<li class="${playing ? "playing" : ""}${isDone ? " heard" : ""}${moonN ? " moon" : ""}" data-key="${esc(r.key)}">${moonN ? "" : wm}${prog && !moonN ? `<i class="tprog" style="--p:${prog.toFixed(3)}" aria-hidden="true"></i>` : ""}
     ${extMode ? `<a class="pbtn" href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="استمع إلى ${esc(r.title)} في تبويب جديد">${icon("i-play")}</a>`
@@ -1590,9 +1631,33 @@ function yearCard(y, kind, isNew) {
     <div class="yo"><i></i></div>
     <div class="ys">${st}</div><span class="cr a"></span><span class="cr b"></span></a>`;
 }
-function grouped(rows, keyFn, labelFn) {
+function fardRow(r, playing, isFav, isDone, prog) {
+  const sub = [r.d ? fmt(r.d) : ""];
+  if (pos[r.key] > 5 && !isDone) sub.push(`توقفت عند ${fmt(pos[r.key])}`);
+  if (isDone) sub.push(`<span class="done">✓ استمعت</span>`);
+  if (offSaved(r)) sub.push(`<span class="done">⤓ محمّلة</span>`);
+  return `<li class="fy${playing ? " playing" : ""}${isDone ? " heard" : ""}" data-key="${esc(r.key)}" data-pr="${esc(r.prayer || "")}" data-day="${r.date ? r.date[0] : ""}">${prog ? `<i class="tprog" style="--p:${prog.toFixed(3)}" aria-hidden="true"></i>` : ""}
+    <button class="fday" data-play="${esc(r.key)}" aria-label="تشغيل ${esc(r.title)}"><b>${r.date ? AR(r.date[0]) : "—"}</b><small>${esc(r.prayer || "")}</small><span class="pi">${icon(playing && !audio.paused ? "i-pause" : "i-play")}</span></button>
+    <div class="info"><span class="ttl long">${esc(fardTitle(r.title))}</span><span class="sub">${sub.filter(Boolean).join(" · ")}</span></div>
+    <div class="acts"><button class="icon-btn ${isFav ? "fav-on" : ""}" data-fav="${esc(r.key)}" aria-pressed="${isFav}" aria-label="المفضلة">${icon(isFav ? "i-heart-f" : "i-heart")}</button></div></li>`;
+}
+/* fard year: one folding card per month; its header shows the month's days with a recitation */
+function fardMonths(rows, y) {
+  const g = new Map(); for (const r of rows) { const k = r.date ? r.date[1] : 0; if (!g.has(k)) g.set(k, []); g.get(k).push(r); }
+  return [...g].map(([k, b]) => `<div class="fym"><h3 class="fmh"><b>${k ? MONTHS[k - 1] : "بدون تاريخ"}</b>${k ? `<small>${AR(y)}هـ</small>` : ""}<i aria-hidden="true"></i><span class="mc"><em>${AR(b.length)}</em> تلاوة</span></h3>
+      <ol class="tracks fyl" data-list>${b.map(r => trackRow(r, "fy")).join("")}</ol></div>`).join("")
+    + `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><pattern id="fmLat" width="34" height="34" patternUnits="userSpaceOnUse"><g fill="none" stroke="#E3C36A" stroke-width=".6" opacity=".16"><rect x="9" y="9" width="16" height="16"/><rect x="9" y="9" width="16" height="16" transform="rotate(45 17 17)"/></g></pattern></defs></svg>`;
+}
+function fardFilter(sec) {
+  if (!sec) return; const pf = FARD_PF;
+  sec.querySelectorAll(".pfil button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pf === pf)));
+  sec.querySelectorAll(".fym").forEach(dt => { let n = 0;
+    dt.querySelectorAll("li").forEach(li => { const ok = !pf || li.dataset.pr === pf; li.hidden = !ok; n += ok; });
+    dt.hidden = !n; dt.querySelector(".mc em").textContent = AR(n); });
+}
+function grouped(rows, keyFn, labelFn, ctx) {
   const out = []; let cur, buf = [];
-  const flush = () => { if (buf.length) { const lb = labelFn(cur, buf); out.push(`${lb ? `<h3 class="grp">${lb}</h3>` : ""}<ol class="tracks" data-list>${buf.map(r => trackRow(r, "year")).join("")}</ol>`); } buf = []; };
+  const flush = () => { if (buf.length) { const lb = labelFn(cur, buf); out.push(`${lb ? `<h3 class="grp">${lb}</h3>` : ""}<ol class="tracks${ctx === "fy" ? " fyl" : ""}" data-list>${buf.map(r => trackRow(r, ctx || "year")).join("")}</ol>`); } buf = []; };
   for (const r of rows) { const k = keyFn(r); if (k !== cur) { flush(); cur = k; } buf.push(r); }
   flush(); return out.join("");
 }
@@ -2317,8 +2382,11 @@ const views = {
         + (P.ram.length ? `<section class="block"><div class="block-h"><h2>${P.ram.some(r => r.night) ? "ليلةً ليلة" : "السور"}</h2><button class="btn pri" data-playall="y-${y}-r">${icon("i-play")}${P.ram.some(r => r.night) ? "تشغيل الليالي بالترتيب" : "تشغيل بالترتيب"}</button></div>
           ${grouped(P.ram, r => r.night || 0, (k, b) => !k && !P.ram.some(r => r.night) ? "" :  k ? `${b.length === 1 && b[0].nightTo ? "الليالي " + AR(k) + "–" + AR(b[0].nightTo) : "الليلة " + AR(k)} <span>${pl(b.length, "clip")}</span>` : `مقاطع أخرى من رمضان ${AR(y)}هـ <span>${pl(b.length, "clip")}</span>`)}</section>` : "");
     } else if (tab === "f") {
-      body = `<section class="block"><div class="block-h"><h2>الفجريات والمغربيات والعشائيات</h2><button class="btn pri" data-playall="y-${y}-f">${icon("i-play")}تشغيل بالترتيب</button></div>
-        ${grouped(P.fard, r => r.date ? r.date[1] : 0, (k, b) => k ? `${MONTHS[k - 1]} ${AR(y)}هـ <span>${AR(b.length)}</span>` : `بدون تاريخ محدد <span>${AR(b.length)}</span>`)}</section>`;
+      const pc = [["", "الكل", P.fard.length], ...["فجر", "مغرب", "عشاء"].map(k => [k, k, P.fard.filter(r => r.prayer === k).length])].filter(x => x[2]);
+      if (FARD_PF && !P.fard.some(r => r.prayer === FARD_PF)) FARD_PF = "";
+      body = `<section class="block fysec" id="fySec"><div class="block-h"><h2>الفجريات والمغربيات والعشائيات</h2><button class="btn pri" data-playall="y-${y}-f">${icon("i-play")}تشغيل بالترتيب</button></div>
+        ${pc.length > 2 ? `<div class="pfil" role="group" aria-label="الصلاة">${pc.map(([k, l, n]) => `<button type="button" data-pf="${k}" aria-pressed="${k === FARD_PF}">${l}<span>${AR(n)}</span></button>`).join("")}</div>` : ""}
+        ${fardMonths(P.fard, y)}</section>`;
     } else {
       body = `<section class="block"><div class="block-h"><h2>تلاوات أخرى</h2><button class="btn pri" data-playall="y-${y}-o">${icon("i-play")}تشغيل الكل</button></div>${trackList(P.other, "year")}</section>`;
     }
@@ -2456,7 +2524,7 @@ function route() {
   else if (h.startsWith("s-")) { html = views.surah(h.slice(2)); nav = "surahs"; }
   else if (h.startsWith("y-")) { html = views.year(h.slice(2)); nav = /-f$/.test(h) ? "fard" : /-r$/.test(h) ? "ramadan" : ""; }
   else { html = views.home(); nav = "home"; }
-  $("#view").innerHTML = html;
+  $("#view").innerHTML = html; fardFilter(document.getElementById("fySec"));
   document.querySelectorAll("[data-nav]").forEach(a => { if (a.dataset.nav === nav) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   const bn = q ? "" : nav === "home" || nav === "ramadan" || nav === "surahs" ? nav : ["mine", "fav", "saved", "marks", "history", "lists", "stats"].includes(nav) ? "mine" : "";
   { const bnEl = document.getElementById("bnav"), i = ["home", "ramadan", "surahs", "mine"].indexOf(bn); if (bnEl) { bnEl.classList.toggle("none", i < 0); if (i >= 0) bnEl.style.setProperty("--i", i); } }
@@ -2486,7 +2554,7 @@ function listFor(id) {
   if (id === "fav") return [...favs].map(k => BY_KEY.get(k)).filter(Boolean);
   if (id === "saved") return ALL.filter(r => OFF.ok && OFF.set.has(r.url));
   if (id.startsWith("s-")) return [...BY_SURAH[+id.slice(2) - 1]].sort((a, b) => (a.year || 9999) - (b.year || 9999));
-  if (id.startsWith("y-")) { const [y, k] = id.slice(2).split("-"), P = yearParts(+y); return k === "r" ? P.ram : k === "f" ? P.fard : k === "o" ? P.other : P.rows; }
+  if (id.startsWith("y-")) { const [y, k] = id.slice(2).split("-"), P = yearParts(+y); return k === "r" ? P.ram : k === "f" ? P.fard.filter(r => !FARD_PF || r.prayer === FARD_PF) : k === "o" ? P.other : P.rows; }
   const c = COLLECTIONS.find(x => x.id === id); return c ? c.tracks.map(t => BY_KEY.get(c.id + ":" + t.id)) : [];
 }
 
@@ -3410,6 +3478,7 @@ document.addEventListener("click", async e => {
   if (p) { e.preventDefault(); const key = p.dataset.play;
     if (p.dataset.resume) { const r = BY_KEY.get(key); playKey(key, r.c.tracks.map(t => BY_KEY.get(r.c.id + ":" + t.id))); }
     else playKey(key, curList); return; }
+  const pfb = e.target.closest(".pfil [data-pf]"); if (pfb) { FARD_PF = pfb.dataset.pf; fardFilter(pfb.closest(".fysec")); return; }
   const pa = e.target.closest("[data-playall]");
   if (pa) { const list = listFor(pa.dataset.playall); if (!list.length) return;
     player.shuffle = !!pa.dataset.shuffle; $("#shufBtn").setAttribute("aria-pressed", player.shuffle);
