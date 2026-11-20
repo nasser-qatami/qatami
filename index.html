@@ -1684,11 +1684,14 @@ function ramadanNight() {
   const n = h >= t.maghrib ? hj.day + 1 : hj.day;   /* the night starts at sunset */
   return n > 30 ? 0 : n;
 }
-/* ---------- Friday: Surat al-Kahf (from Thursday maghrib to the end of Friday) ---------- */
+/* ---------- Friday: Surat al-Kahf (from Thursday maghrib to Friday maghrib) ---------- */
 let lastKahf = [];
 function isKahfDay() {
   if (/[?&]demo-kahf/.test(location.search)) return true;
-  const d = new Date(), w = d.getDay(); return w === 5 || (w === 4 && d.getHours() >= 18);
+  const d = new Date(), w = d.getDay(); if (w !== 4 && w !== 5) return false;
+  let mg = 18; try { const loc = store.get("loc", null) || LOCS.riyadh; mg = PT.compute(d, loc.lat, loc.lng, false).maghrib; } catch {}
+  const h = d.getHours() + d.getMinutes() / 60;
+  return w === 4 ? h >= mg : h < mg;   /* from Thursday maghrib to Friday maghrib */
 }
 let KAHF_IT = new Map(), kahfSeq = null;
 /* the part of a recording that is al-Kahf: from its surah index when there is one */
