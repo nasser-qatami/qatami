@@ -1277,6 +1277,7 @@ const BY_SURAH = (() => {
     if (r.surah) found.set(r.surah, 0);
     else if (r.t.idx) for (const [t, n, sub] of r.t.idx) for (const s of find(n)) if (!found.has(s)) found.set(s, t);
     if (!found.size && !r.surah) for (const s of find(r.t.title || "")) if (!found.has(s)) found.set(s, 0);
+    if (!r.surah && found.size) r.sOrd = Math.min(...found.keys());   /* titled recordings ("سورة الإسراء كاملة – رمضان ١٤٣٢") sort by mushaf order too */
     for (const [s, t] of found) { by[s - 1].push(r); if (t > 5) SURAH_AT.set(s + "|" + r.key, t); }
   }
   return by;
@@ -1287,7 +1288,7 @@ const PL = { clip: ["مقطع واحد", "مقطعان", "مقاطع", "مقطع
   rec: ["تسجيل واحد", "تسجيلان", "تسجيلات", "تسجيلًا"], year: ["سنة", "سنتان", "سنوات", "سنة"] };
 const pl = (n, k) => { const f = PL[k]; return n === 1 ? f[0] : n === 2 ? f[1] : n <= 10 ? `${AR(n)} ${f[2]}` : `${AR(n)} ${f[3]}`; };
 const isKhatma = c => /^مصحف/.test(c.kind || "");
-const byNight = (a, b) => (a.night || 99) - (b.night || 99) || (a.surah || 999) - (b.surah || 999) || a.title.localeCompare(b.title, "ar");
+const byNight = (a, b) => (a.night || 99) - (b.night || 99) || (a.surah || a.sOrd || 999) - (b.surah || b.sOrd || 999) || a.title.localeCompare(b.title, "ar");
 const byDate = (a, b) => (a.date ? a.date[1] * 40 + a.date[0] : 9999) - (b.date ? b.date[1] * 40 + b.date[0] : 9999) || a.title.localeCompare(b.title, "ar");
 function yearParts(y) {
   const rows = ALL.filter(r => r.year === y);
