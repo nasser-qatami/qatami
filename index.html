@@ -1033,13 +1033,11 @@ html.spbg body>header.top,html.spbg body>div.wrap,html.spbg body>main,html.spbg 
 
 
 .kx-seal{display:flex;align-items:center;gap:14px;margin:18px 2px 2px;padding:14px 14px;border-radius:20px;border:1px solid rgba(227,195,106,.25);background:linear-gradient(135deg,rgba(227,195,106,.08),rgba(227,195,106,.02))}
-.kx-seal .sg{flex:none;width:62px;height:62px;color:rgba(227,195,106,.55)}
-.kx-seal .sg svg{width:100%;height:100%;overflow:visible}
-.kx-seal .ck{stroke:rgba(227,195,106,.25)}
-.kx-seal.done{border-color:rgba(227,195,106,.6);background:radial-gradient(120% 140% at 100% 50%,rgba(227,195,106,.22),rgba(227,195,106,.04) 70%)}
-.kx-seal.done .sg{color:#E3C36A;filter:drop-shadow(0 0 10px rgba(255,226,140,.45))}
-.kx-seal.done .sg path:first-child{fill:url(#kxSealG)}
-.kx-seal.done .ck{stroke:#1E150A}
+.kx-seal .sg{flex:none;width:80px;text-align:center;color:rgba(227,195,106,.35)}
+.kx-seal .tm{display:block;font-family:"ArefRuqaa","Amiri",serif;font-weight:700;font-size:46px;line-height:1.25;color:rgba(227,195,106,.22)}
+.kx-seal .ln{display:block;width:70px;margin:-4px auto 0}
+.kx-seal.done .sg{color:#E3C36A}
+.kx-seal.done .tm{background:linear-gradient(180deg,#FFF6D6,#E3C36A 55%,#A07A2C);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px rgba(255,226,140,.3))}
 .kx-seal.pop .sg{animation:kxpop .9s cubic-bezier(.3,1.6,.5,1)}@keyframes kxpop{0%{transform:scale(.4) rotate(-30deg);opacity:0}100%{transform:none;opacity:1}}
 .kx-seal .tx{min-width:0;display:grid;gap:2px}
 .kx-seal b{font-family:var(--f-display);font-size:1.12rem;line-height:1.5;color:#F3E6C4}
@@ -1098,6 +1096,7 @@ html.spbg body>header.top,html.spbg body>div.wrap,html.spbg body>main,html.spbg 
    "KFGQPC" -> King Fahd Complex Uthmanic Hafs (the opening verse only; it turns digits into ayah-end marks) */
 @font-face{font-family:"Amiri";font-weight:400;font-display:swap;src:url(fonts/naskh400.woff2) format("woff2")}
 @font-face{font-family:"Amiri";font-weight:700;font-display:swap;src:url(fonts/naskh700.woff2) format("woff2")}
+@font-face{font-family:"ArefRuqaa";font-weight:700;font-display:swap;src:url(fonts/ruqaa700.woff2) format("woff2")}
 @font-face{font-family:"Amiri";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/naskh400.woff2) format("woff2")}
 @font-face{font-family:"IBM Plex Sans Arabic";font-weight:300 400;font-display:swap;src:url(fonts/cairo400.woff2) format("woff2")}
 @font-face{font-family:"IBM Plex Sans Arabic";font-weight:500;font-display:swap;src:url(fonts/cairo500.woff2) format("woff2")}
@@ -1726,8 +1725,7 @@ function kahfStreak() { const w = kahfWeeks(60); let n = 0, i = w.length - 1; if
 function kahfSeal() {
   const w = kahfWeeks(5), now = w[w.length - 1].done, st = kahfStreak();
   return `<div class="kx-seal${now ? " done" : ""}" id="kxSeal">
-    <div class="sg"><svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor"><path d="M32 3l5 6 7.6-2.4 1.6 7.8 7.8 1.6L51.6 23.6 58 29l-6 5 2.4 7.6-7.8 1.6-1.6 7.8L37.4 48.6 32 55l-5-6-7.6 2.4-1.6-7.8-7.8-1.6L12.4 34.4 6 29l6-5-2.4-7.6 7.8-1.6 1.6-7.8L26.6 9.4z" stroke-width="1.4"/><circle cx="32" cy="29" r="15" stroke-width=".8" stroke-dasharray="${now ? "0" : "2 3"}"/></g>
-      <path class="ck" d="M24.5 29.5l5 5 10-10.5" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="sg"><span class="tm">تمّت</span><svg class="ln" viewBox="0 0 80 10" aria-hidden="true"><path d="M2 5h30M48 5h30" stroke="currentColor" stroke-width=".8"/><path d="M40 1l4 4-4 4-4-4z" fill="currentColor"/></svg></div>
     <div class="tx"><b>${now ? "أتممت الكهف هذه الجمعة" : "لم تُتمّها بعد هذه الجمعة"}</b>
       <span>${now ? (st > 1 ? `${AR(st)} جُمَع متتالية` : "") : "تُحسب لك إذا استمعت إلى السورة كاملة"}</span>
       <i class="wk" aria-label="آخر خمس جُمَع">${w.map((x, i) => `<em class="${x.done ? "y" : ""}${i === w.length - 1 ? " c" : ""}"></em>`).join("")}<small>آخر ٥ جُمَع</small></i></div>
