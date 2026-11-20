@@ -1729,7 +1729,7 @@ function kahfSeal() {
     <div class="sg"><svg viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="currentColor"><path d="M32 3l5 6 7.6-2.4 1.6 7.8 7.8 1.6L51.6 23.6 58 29l-6 5 2.4 7.6-7.8 1.6-1.6 7.8L37.4 48.6 32 55l-5-6-7.6 2.4-1.6-7.8-7.8-1.6L12.4 34.4 6 29l6-5-2.4-7.6 7.8-1.6 1.6-7.8L26.6 9.4z" stroke-width="1.4"/><circle cx="32" cy="29" r="15" stroke-width=".8" stroke-dasharray="${now ? "0" : "2 3"}"/></g>
       <path class="ck" d="M24.5 29.5l5 5 10-10.5" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <div class="tx"><b>${now ? "أتممت الكهف هذه الجمعة" : "لم تُتمّها بعد هذه الجمعة"}</b>
-      <span>${now ? (st > 1 ? `${AR(st)} جُمَع متتالية، ثبّتك الله` : "نوّر الله لك ما بين الجمعتين") : "تُحسب لك إذا استمعت إلى السورة كاملة"}</span>
+      <span>${now ? (st > 1 ? `«أضاء له من النور ما بين الجمعتين» · ${AR(st)} جُمَع متتالية` : "«أضاء له من النور ما بين الجمعتين»") : "تُحسب لك إذا استمعت إلى السورة كاملة"}</span>
       <i class="wk" aria-label="آخر خمس جُمَع">${w.map((x, i) => `<em class="${x.done ? "y" : ""}${i === w.length - 1 ? " c" : ""}"></em>`).join("")}<small>آخر ٥ جُمَع</small></i></div>
   </div>`;
 }
