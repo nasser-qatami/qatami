@@ -9,9 +9,6 @@
 <meta name="theme-color" content="#F7F0E1">
 <link rel="preconnect" href="https://archive.org" crossorigin>
 <link rel="dns-prefetch" href="https://archive.org">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap">
 <style>
 body{margin:0}
 [hidden]{display:none!important}
@@ -1025,6 +1022,19 @@ html.spbg body>header.top,html.spbg body>div.wrap,html.spbg body>main,html.spbg 
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="نبأ عظيم"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+/* Self-hosted fonts. Family names are kept as aliases so every existing rule, SVG and share-card canvas picks them up:
+   "Amiri" -> Noto Naskh Arabic (headings, Quran text), "IBM Plex Sans Arabic" -> Cairo (interface),
+   "KFGQPC" -> King Fahd Complex Uthmanic Hafs (the opening verse only; it turns digits into ayah-end marks) */
+@font-face{font-family:"Amiri";font-weight:400;font-display:swap;src:url(fonts/naskh400.woff2) format("woff2")}
+@font-face{font-family:"Amiri";font-weight:700;font-display:swap;src:url(fonts/naskh700.woff2) format("woff2")}
+@font-face{font-family:"Amiri";font-style:italic;font-weight:400;font-display:swap;src:url(fonts/naskh400.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Sans Arabic";font-weight:300 400;font-display:swap;src:url(fonts/cairo400.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Sans Arabic";font-weight:500;font-display:swap;src:url(fonts/cairo500.woff2) format("woff2")}
+@font-face{font-family:"IBM Plex Sans Arabic";font-weight:600 800;font-display:swap;src:url(fonts/cairo600.woff2) format("woff2")}
+@font-face{font-family:"KFGQPC";font-display:swap;src:url(fonts/hafs.otf) format("opentype")}
+.hero .ayah,.portrait .cap q{font-family:"KFGQPC","Amiri",serif!important}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
