@@ -1707,7 +1707,7 @@ function kahfItems() {
     const parts = next.has(s.r.key) ? [s, next.get(s.r.key)] : [s];
     const len = parts.reduce((a, p) => a + Math.max(0, (p.to ?? p.r.d ?? 0) - p.from), 0);
     return { r: s.r, parts, at: s.from, len, two: parts.length > 1, full: parts.length > 1 || (s.whole && !next.has(s.r.key)) };
-  }).sort((a, b) => (b.full - a.full) || ((b.r.surah === 18) - (a.r.surah === 18)) || (b.r.year || 0) - (a.r.year || 0));
+  }).sort((a, b) => (b.r.year || 0) - (a.r.year || 0) || (b.full - a.full) || (a.r.night || 0) - (b.r.night || 0));
 }
 const kahfLabel = x => x.two ? `الليلتان ${AR(x.r.night)}–${AR(x.r.night + 1)}` : x.full ? (x.r.night ? "كاملة · الليلة " + AR(x.r.night) : "كاملة") : x.r.night ? "الليلة " + AR(x.r.night) : "مقطع";
 function kahfGo(i) {
@@ -1745,9 +1745,9 @@ function kahfWatch() {
 setTimeout(() => { audio.addEventListener("timeupdate", kahfWatch); audio.addEventListener("ended", () => { if (kahfSeq && kahfSeq.i === kahfSeq.it.parts.length - 1) { kahfSeq = null; kahfDone(); } }); });   /* audio is declared further down */
 function kahfRail() {
   if (!isKahfDay()) return "";
-  const list = kahfItems().slice(0, 14);
+  const list = kahfItems().slice(0, 30);
   KAHF_IT = new Map(list.map(x => [x.r.key, x])); lastKahf = list.map(x => x.r); if (!list.length) return "";
-  const fri = new Date().getDay() === 5, top = list[0];
+  const fri = new Date().getDay() === 5, top = list.find(x => x.full) || list[0];
   return `<section class="kahfx">
     <svg class="kx-lat" aria-hidden="true"><defs><linearGradient id="kxSealG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0BF"/><stop offset=".45" stop-color="#E3C36A"/><stop offset="1" stop-color="#9C7428"/></linearGradient><pattern id="kxlat" width="44" height="44" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width=".7"><rect x="12" y="12" width="20" height="20"/><rect x="12" y="12" width="20" height="20" transform="rotate(45 22 22)"/></g></pattern></defs><rect width="100%" height="100%" fill="url(#kxlat)"/></svg>
     <div class="kx-glow" aria-hidden="true"></div>
@@ -1766,7 +1766,7 @@ function kahfRail() {
     </div>
     <button class="kx-main" type="button" data-kf="${esc(top.r.key)}" data-at="${top.at}"><span class="pb">${icon("i-play")}</span><span><b>استمع لسورة الكهف كاملة</b><em>رمضان ${top.r.year ? AR(top.r.year) + "هـ" : ""} · ${fmt(top.len || top.r.d || 0)}</em></span></button>
     <div class="kx-sub"><span>تلاوات الكهف عبر السنين</span><b>${AR(list.length)}</b></div>
-    <div class="kx-rail">${list.slice(1).map(x => { const { r, at } = x; return `<button class="kx-c${player.cur && player.cur.key === r.key ? " on" : ""}" type="button" data-kf="${esc(r.key)}" data-at="${at}" aria-label="تشغيل سورة الكهف ${r.year ? AR(r.year) : ""}">
+    <div class="kx-rail">${list.map(x => { const { r, at } = x; return `<button class="kx-c${player.cur && player.cur.key === r.key ? " on" : ""}" type="button" data-kf="${esc(r.key)}" data-at="${at}" aria-label="تشغيل سورة الكهف ${r.year ? AR(r.year) : ""}">
       <span class="y">${r.year ? AR(r.year) : "—"}</span><span class="tt">${kahfLabel(x)}</span><span class="dd">${x.len ? fmt(x.len) : "&nbsp;"}</span></button>`; }).join("")}</div>
     ${kahfSeal()}
   </section>`;
