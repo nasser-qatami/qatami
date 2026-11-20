@@ -1709,7 +1709,7 @@ function kahfItems() {
     return { r: s.r, parts, at: s.from, len, two: parts.length > 1, full: parts.length > 1 || (s.whole && !next.has(s.r.key)) };
   }).sort((a, b) => (b.r.year || 0) - (a.r.year || 0) || (b.full - a.full) || (a.r.night || 0) - (b.r.night || 0));
 }
-const kahfLabel = x => x.two ? `الليلتان ${AR(x.r.night)}–${AR(x.r.night + 1)}` : x.full ? (x.r.night ? "كاملة · الليلة " + AR(x.r.night) : "كاملة") : x.r.night ? "الليلة " + AR(x.r.night) : "مقطع";
+const kahfLabel = x => x.two ? `الليلتان ${AR(x.r.night)}–${AR(x.r.night + 1)}` : x.full ? (x.r.night ? "كاملة · الليلة " + AR(x.r.night) : "كاملة") : x.r.night ? "الليلة " + AR(x.r.night) : x.r.prayer ? "صلاة " + x.r.prayer : "مقطع";
 function kahfGo(i) {
   const q = kahfSeq, p = q.it.parts[i]; q.i = i; q.busy = true;
   setQueue(q.it.parts.map(x => x.r), p.r.key); load(p.r);
