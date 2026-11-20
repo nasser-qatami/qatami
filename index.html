@@ -1745,7 +1745,7 @@ function kahfWatch() {
 setTimeout(() => { audio.addEventListener("timeupdate", kahfWatch); audio.addEventListener("ended", () => { if (kahfSeq && kahfSeq.i === kahfSeq.it.parts.length - 1) { kahfSeq = null; kahfDone(); } }); });   /* audio is declared further down */
 async function kahfStatsRefresh() {
   if (!isKahfDay()) return;
-  const c = store.get("ktop", null); if (c && Date.now() - c.t < TOPSTAT.ttl) return;
+  const KT = 3600e3, c = store.get("ktop", null); if (c && Date.now() - c.t < KT) return;   /* every hour on Kahf days */
   try {
     const iso = d => d.toISOString().slice(0, 19) + "Z", keys = new Set(BY_SURAH[17].map(r => r.key)), cnt = {}, ex = [];
     for (let i = 0; i < 10; i++) {
@@ -1757,7 +1757,7 @@ async function kahfStatsRefresh() {
     }
     store.set("ktop", { t: Date.now(), c: cnt });
     const el = document.querySelector(".kahfx"); if (el && !(player.cur && el.querySelector(".kx-c.on"))) el.outerHTML = kahfRail();
-  } catch { store.set("ktop", { t: Date.now() - TOPSTAT.ttl + 30 * 60e3, c: (c && c.c) || {} }); }
+  } catch { store.set("ktop", { t: Date.now() - KT + 10 * 60e3, c: (c && c.c) || {} }); }
 }
 function kahfRail() {
   if (!isKahfDay()) return "";
