@@ -2560,7 +2560,7 @@ function route() {
 /* ---- reels ---- */
 function reelsSync(k) {
   let box = document.getElementById("reels");
-  if (k === null) { if (box) { box.remove(); document.body.classList.remove("reels"); } return; }
+  if (k === null) { if (box) { box.remove(); document.body.classList.remove("reels"); } if (reelAudio) { reelAudio.pause(); reelAudio.removeAttribute("src"); reelAudio = null; } return; }
   document.body.classList.add("reels");
   try { audio.pause(); } catch {}
   if (box) return;
@@ -2569,7 +2569,17 @@ function reelsSync(k) {
   box.querySelector(".rx").addEventListener("click", () => navigate(""));
   document.body.appendChild(box);
 }
+let reelAudio = null;
+/* iPhone only lets sound start from a tap. The tap on «مقاطع» happens here, not inside the clips page,
+   so the shared player for the clips is created and unlocked here, during that tap, and handed to the page. */
+function reelUnlock() {
+  if (reelAudio) return; reelAudio = new Audio(); reelAudio.preload = "auto"; reelAudio.setAttribute("playsinline", "");
+  reelAudio.src = "data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA"; const p = reelAudio.play(); if (p) p.then(() => { if (reelAudio && reelAudio.src.startsWith("data:")) reelAudio.pause(); }).catch(() => {});
+}
+document.addEventListener("click", e => { if (e.target.closest('a[href="#reels"],a[href^="#reels-"]')) reelUnlock(); }, true);
+document.addEventListener("touchend", e => { if (e.target.closest('a[href="#reels"],a[href^="#reels-"]')) reelUnlock(); }, true);
 window.reelHook = {
+  audio: () => reelAudio || (reelAudio = new Audio()),
   stat: (p, t) => stat(p, t),
   url: () => location.origin + location.pathname,
   at: k => { try { history.replaceState(null, "", "#reels-" + k); } catch {} },

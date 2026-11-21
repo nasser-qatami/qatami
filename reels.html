@@ -130,7 +130,7 @@ document.fonts.ready.then(fit);addEventListener('resize',fit);
 const H=(()=>{try{return parent!==window&&parent.reelHook}catch{return null}})()||null;
 const S=(p,t)=>{try{H&&H.stat(p,t)}catch{}};
 const LK=(()=>{try{return JSON.parse(localStorage.getItem('qtm:rlike')||'{}')}catch{return{}}})();
-const A=new Audio();A.preload='auto';let cur=-1,needTap=false;
+const A=(H&&H.audio&&H.audio())||new Audio();A.preload='auto';let cur=-1,needTap=false;
 const secs=[...document.querySelectorAll('.reel')];
 secs.forEach((el,i)=>{const r=D[i];
  el.insertAdjacentHTML('beforeend','<div class="pz"><svg><use href="#pl"/></svg></div>');
