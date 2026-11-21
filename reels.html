@@ -98,6 +98,14 @@ body{font-family:Cairo,sans-serif;color:var(--ink)}
 .ay .l.cu{color:#F7DE9A;text-shadow:0 0 14px rgba(245,220,150,.9),0 0 30px rgba(245,220,150,.45)}
 .reel.au .glass .gt{margin-bottom:16px}
 .reel .prog i{transition:none}
+
+/* video reel: slimmer bottom panel so more of the video shows */
+.reel.vd .glass{inset:auto 22px calc(env(safe-area-inset-bottom,0px) + 22px);padding:10px 12px 11px;border-radius:20px}
+.reel.vd .gt{margin-bottom:8px}.reel.vd .sn{font-size:24px}.reel.vd .sn small{font-size:11px}
+.reel.vd .who{font-size:10.5px;gap:0}.reel.vd .who b{font-size:12px}
+.reel.vd .tm{margin-top:4px;font-size:10px}
+.reel.vd .row{margin-top:8px;gap:8px}.reel.vd .ib{width:40px;border-radius:12px}.reel.vd .ib svg{width:18px;height:18px}
+.reel.vd .full{padding:8px;font-size:12.5px;border-radius:12px}
 </style>
 <body><svg width="0" height="0" style="position:absolute"><defs>
 <pattern id="lat" width="64" height="64" patternUnits="userSpaceOnUse"><g fill="none" stroke="#E3C36A" stroke-width=".7" opacity=".16"><rect x="16" y="16" width="32" height="32"/><rect x="16" y="16" width="32" height="32" transform="rotate(45 32 32)"/></g></pattern>
@@ -110,7 +118,7 @@ body{font-family:Cairo,sans-serif;color:var(--ink)}
 <script>
 fetch('reels.json',{cache:'no-cache'}).then(r=>r.json()).then(D=>{
 const CL=/[\u0621-\u064A\u0671-\u06D3\u06FA-\u06FF][\u064B-\u065F\u0670\u06D6-\u06ED\u0640]*/g;
-function wordsHtml(a){const W=a.text.split(" ");return W.map((w,x)=>{const ls=w.match(CL)||[w],ts=a.w[x],nx=a.w[x+1],cap=Math.max(.4,.26*ls.length),te=Math.min(nx!==undefined?nx:ts+cap,ts+cap);
+function wordsHtml(a){const W=a.text.split(" ");return W.map((w,x)=>{const ls=w.match(CL)||[w],ts=a.w[x],nx=a.w[x+1],cap=Math.max(.5,.42*ls.length),te=Math.min(nx!==undefined?nx:ts+cap,ts+cap);
   const wt=ls.map((l,i)=>(/^[\u0627\u0622\u0648\u064A\u0649]/.test(l)&&!/[\u064E\u064F\u0650\u0651\u0652\u0653]/.test(l.slice(1))?1.7:1)*(i===ls.length-1?1.4:1)),sum=wt.reduce((p,q)=>p+q,0);let acc=0;
   return ls.map((l,i)=>{const t=ts+(te-ts)*acc/sum;acc+=wt[i];return`<span class="l" data-t="${t.toFixed(2)}">${l}</span>`}).join("")}).join(" ")}
 const bars=Array.from({length:34},(_,i)=>`<b style="--h:${8+Math.round(Math.abs(Math.sin(i*1.7)*Math.cos(i*.6))*26)}px;animation-delay:${(i%9)*-.13}s"></b>`).join("");
@@ -141,7 +149,7 @@ secs.forEach((el,i)=>{const r=D[i];
  const v=el.querySelector('video'),prog=el.querySelector('.prog i'),tm=el.querySelector('[data-time]'),ays=[...el.querySelectorAll('.ay')],dots=[...el.querySelectorAll('.dots b')],wsp=ays.map(a=>[...a.querySelectorAll('.l')].map(l=>[l,+l.dataset.t]));
  el._v=v;
  el._tick=()=>{const c=A.currentTime||0;
-  wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.6)})});
+  wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.9)})});
   prog.style.width=Math.min(100,c/r.dur*100)+'%';tm.textContent=fmt(c);
   let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
   if(v&&!A.paused&&Math.abs(v.currentTime-c)>.3)v.currentTime=c};
