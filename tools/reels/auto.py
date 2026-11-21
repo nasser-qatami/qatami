@@ -274,4 +274,10 @@ for cd in cands:
 if not A.dry:
     json.dump(SEEDS, open(SEEDS_P, "w"), ensure_ascii=False, indent=0)
     json.dump(REJ[-300:], open(REJ_P, "w"), ensure_ascii=False, indent=0)
+if made and not A.dry:
+    ids = [m["k"] for m in made]
+    p = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "reels", "refine.py")] + ids, capture_output=True, text=True, cwd=ROOT)
+    log("refine:", (p.stdout or p.stderr)[-300:])
+    try: REELS = json.load(open(RJ, encoding="utf-8"))
+    except Exception: pass
 print(json.dumps({"made": made, "skipped": skipped, "total": len(REELS)}, ensure_ascii=False))
