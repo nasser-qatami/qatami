@@ -119,6 +119,23 @@ def snap(src, t, lo, hi, side):
     while j1 < len(d) - 1 and d[j1 + 1] < d[i] + 3: j1 += 1
     return float(max(ts[j0], ts[j1] - 0.35)) if side == "start" else float(min(ts[j1], ts[j0] + 0.45))
 
+
+def lead_trim(path, dur):
+    """If the clip starts in the middle of sound (the tail of the previous ayah), return how many seconds to cut so it starts in a pause."""
+    x = pcm(path, 0, min(dur, 6)); n = int(0.05 * SR); m = len(x) // n
+    if m < 20: return 0.0
+    d = 20 * np.log10(np.sqrt((x[:m * n].reshape(m, n) ** 2).mean(1)) + 1e-9); med = float(np.median(d)); low = d < med - 7
+    if low[:4].all(): return 0.0          # already starts in a pause
+    i = 0
+    while i < min(m, 70):                  # first pause (>= 0.2 s) in the first 3.5 s
+        if low[i]:
+            j = i
+            while j < m and low[j]: j += 1
+            if j - i >= 4: return round((i + j) / 2 * 0.05, 2)
+            i = j
+        else: i += 1
+    return 0.0
+
 # ---------- ayah matching ----------
 def match(W, sur):
     V = Q[sur - 1]["verses"]; nw = [norm(w[0]) for w in W]; res = []
@@ -202,13 +219,18 @@ def build(key, t):
         dur = round(e0 - s0, 2); k = new_id(); out = os.path.join(ROOT, "audio", "reels", k + ".mp3")
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{s0:.2f}", "-t", f"{dur:.2f}", "-i", src, "-vn", "-ac", "2", "-ar", "44100",
                         "-af", f"afade=t=in:d=0.25,afade=t=out:st={max(0,dur-0.6):.2f}:d=0.6,loudnorm=I=-16:TP=-1.5:LRA=11", "-b:a", "112k", out], check=True, timeout=900)
+        lt = lead_trim(out, dur)
+        if lt > 0.15:
+            tmp = out + ".tmp.mp3"
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{lt:.2f}", "-i", out, "-t", f"{dur-lt:.2f}", "-af", "afade=t=in:d=0.2", "-b:a", "112k", tmp], check=True)
+            os.replace(tmp, out); s0 += lt; dur = round(dur - lt, 2); log(f"  trimmed {lt}s of the previous ayah's tail")
         # verify: first and last words of the clip must be the first/last words of the ayat
         CW = words(pcm(out, 0, dur + 1))
         V = Q[sur - 1]["verses"]; f3 = " ".join(norm(V[ch[0]["v"] - 1]["text"]).split()[:3]); l3 = " ".join(norm(V[ch[-1]["v"] - 1]["text"]).split()[-3:])
         cw = [norm(w[0]) for w in CW]
-        okf = difflib.SequenceMatcher(None, " ".join(cw[:3]), f3).ratio(); okl = difflib.SequenceMatcher(None, " ".join(cw[-3:]), l3).ratio()
+        okf = min(difflib.SequenceMatcher(None, " ".join(cw[:3]), f3).ratio(), difflib.SequenceMatcher(None, cw[0] if cw else "", f3.split()[0]).ratio() + 0.2); okl = difflib.SequenceMatcher(None, " ".join(cw[-3:]), l3).ratio()
         log(f"  {key}@{t} سورة {sur} {ch[0]['v']}-{ch[-1]['v']} {dur}s  start~{okf:.2f} end~{okl:.2f}")
-        if okf < 0.55 or okl < 0.55:
+        if okf < 0.7 or okl < 0.55:
             os.remove(out); continue
         ay = []
         for j, m in enumerate(ch):
