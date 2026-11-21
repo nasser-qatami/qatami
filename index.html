@@ -2632,7 +2632,7 @@ window.reelHook = {
   },
   full: (key, off) => {
     const r = BY_KEY.get(key); if (!r) return;
-    const bx = document.getElementById("reels"); if (bx) bx.dataset.go = "1"; window._fromReel = 1;
+    const bx = document.getElementById("reels"); if (bx) bx.dataset.go = "1";
     setTimeout(() => { const li = document.querySelector(`#view li[data-key="${CSS.escape(key)}"]`); if (li) { li.scrollIntoView({ block: "center", behavior: "smooth" }); li.classList.add("hl"); setTimeout(() => li.classList.remove("hl"), 2600); } }, 650);
     navigate(r.year ? "y-" + r.year + "-" + (r.cat === "ramadan" ? "r" : r.cat === "fard" ? "f" : "o") : "");
     pos[key] = off;
@@ -2699,7 +2699,7 @@ function load(r, { resume = true, autoplay = true, fade = false } = {}) {
   if (useYt) { audio.pause(); audio.removeAttribute("src"); $("#vbox").hidden = true; ytShow(r, autoplay); }
   else { ytHide(); vReset(); const V = asVid(r); $("#vbox").hidden = !V; audio.controls = false; $("#vttl").textContent = r.title; if (V && r.vurl) audio.poster = vPoster(r); else audio.removeAttribute("poster"); audio.src = V && r.vurl ? r.vurl : r.url; audio.playbackRate = speed; vLoading(V && autoplay); }
   const start = resume && pos[r.key] > 5 && !done.has(r.key) ? pos[r.key] : 0;
-  audio.addEventListener("loadedmetadata", function once() { audio.removeEventListener("loadedmetadata", once); if (start && start < audio.duration - 3) { audio.currentTime = start; if (!window._fromReel) toast("نكمل من " + fmt(start)); window._fromReel = 0; } }, { once: true });
+  audio.addEventListener("loadedmetadata", function once() { audio.removeEventListener("loadedmetadata", once); if (start && start < audio.duration - 3) { audio.currentTime = start; toast("نكمل من " + fmt(start)); } }, { once: true });
   store.set("last", { key: r.key });
   $("#nowTitle").textContent = r.title;
   $("#nowSub").textContent = r.c.title + (r.year && r.c.multi ? " · " + yearLabel(r.year) : "");
