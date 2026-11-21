@@ -305,6 +305,9 @@ function digest(hits, days) {
     else if (kind === "end") { D.ends += c; track(rest, h.title).ends += c; }
     else if (kind === "visit") { if (rest === "back") D.back += c; else D.fresh += c; perDay((d, n) => { d.v += n; }); }
     else if (kind === "feature") D.feats.push({ key: rest, n: c });
+    else if (kind === "mk") D.feats.push({ key: "mark", n: c });
+    else if (kind === "rw") D.feats.push({ key: "rewind", n: c });
+    else if (kind === "rl") { const k2 = rest.split("/")[0]; D.feats.push({ key: k2 === "v" ? "reels" : k2 === "like" ? "reel-like" : k2 === "share" ? "reel-share" : k2 === "full" ? "reel-full" : "", n: c }); }
     else if (kind === "err") D.errs.push({ key: rest, title: h.title || rest, n: c, last: ((h.stats || []).filter(s => s.daily > 0).pop() || {}).day });
     else if (kind === "tour") { D.tour.all += c; if (rest === "finished") D.tour.done += c; }
   }
@@ -354,7 +357,7 @@ function drawClock(hrs) {
   $("clockNote").innerHTML = max ? `أكثر وقت تشغيل <b class="gt">${hourName(peak)} – ${hourName((peak + 1) % 24)}</b>` : "تظهر أول ما يبدأ الناس يشغّلون";
 }
 function gauge(id, part, whole) { const p = whole ? Math.min(1, part / whole) : 0; const n = $(id + "N"); if (n) n.textContent = whole ? ar(part) + " من " + ar(whole) : "لا بيانات بعد"; $(id).style.setProperty("--len", (p * 314).toFixed(0)); $(id + "T").textContent = whole ? ar(p * 100) + "٪" : "–"; }
-const FEAT = { fav: ["♡", "المفضلة"], offline: ["⤓", "بدون نت"], "video-tag": ["▶", "المرئي"], "sleep-timer": ["☾", "مؤقت النوم"], card: ["▣", "بطاقة التلاوة"], share: ["↗", "المشاركة"], list: ["☰", "القوائم"], theme: ["◐", "تغيير المظهر"], "tour-open": ["✦", "فتحوا الجولة"] };
+const FEAT = { fav: ["♡", "المفضلة"], offline: ["⤓", "بدون نت"], "video-tag": ["▶", "المرئي"], "sleep-timer": ["☾", "مؤقت النوم"], card: ["▣", "بطاقة التلاوة"], share: ["↗", "المشاركة"], list: ["☰", "القوائم"], mark: ["⌑", "العلامات"], rewind: ["↺", "إعادة مقطع"], reels: ["▷", "مشاهدات المقاطع"], "reel-like": ["♥", "إعجاب بمقطع"], "reel-share": ["↗", "مشاركة مقطع"], "reel-full": ["◉", "فتحوا الليلة كاملة"], theme: ["◐", "تغيير المظهر"], "tour-open": ["✦", "فتحوا الجولة"] };
 const REF = n => !n ? "رابط مباشر" : /whatsapp|wa\.me/i.test(n) ? "واتساب" : /google/i.test(n) ? "بحث قوقل" : /t\.co|twitter|x\.com/i.test(n) ? "تويتر / X" : /telegram|t\.me/i.test(n) ? "تيليجرام" : /instagram/i.test(n) ? "إنستقرام" : /snapchat/i.test(n) ? "سناب" : /facebook/i.test(n) ? "فيسبوك" : /youtube/i.test(n) ? "يوتيوب" : n;
 const SHADES = ["#FBEFC6", "#E3C36A", "#B98F38", "#6E5220", "#4A3716"];
 function stackHtml(rows) {
@@ -383,6 +386,7 @@ function render(D, P, days, refs, systems, range) {
   drawClock(D.hours);
   gauge("gBack", D.back, D.back + D.fresh); gauge("gEnd", D.ten, D.listeners);
   /* features */
+  const fmx = new Map(); D.feats.forEach(f => fmx.set(f.key, (fmx.get(f.key) || 0) + f.n)); D.feats = [...fmx].map(([key, n]) => ({ key, n }));
   const fs = D.feats.filter(f => FEAT[f.key] && f.n).sort((a, b) => b.n - a.n), fm = Math.max(1, ...fs.map(f => f.n));
   let fh = fs.map(f => `<div class="f"><div class="i">${FEAT[f.key][0]}</div><b>${ar(f.n)}</b><span>${FEAT[f.key][1]}</span><div class="m"><u style="--w:${f.n / fm * 100}%"></u></div></div>`).join("");
   if (D.tour.all) fh += `<div class="f"><div class="i">✦</div><b>${ar(D.tour.done / D.tour.all * 100)}٪</b><span>كمّلوا الجولة</span><div class="m"><u style="--w:${D.tour.done / D.tour.all * 100}%"></u></div></div>`;
