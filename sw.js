@@ -1,5 +1,5 @@
 /* Service worker: lets the site open and play saved recitations without internet. */
-const APP = "qtm-app-v17", AUD = "qtm-audio-v1";
+const APP = "qtm-app-v18", AUD = "qtm-audio-v1";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(APP).then(c => Promise.all(["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./img/portrait.webp", "./img/door-ramadan.jpg", "./img/door-fard.jpg", "./fonts/naskh400.woff2", "./fonts/naskh700.woff2", "./fonts/cairo400.woff2", "./fonts/cairo500.woff2", "./fonts/cairo600.woff2", "./fonts/hafs.otf", "./fonts/ruqaa700.woff2", "./reels.html"].map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });
@@ -8,6 +8,8 @@ self.addEventListener("activate", e => {
 });
 async function page(req) {
   const c = await caches.open(APP);
+  /* the clips page opens from the saved copy at once (it is saved fresh with every release) and refreshes quietly */
+  if (/\/reels\.html$/.test(new URL(req.url).pathname)) { const hit = await c.match("./reels.html"); if (hit) { fetch("./reels.html", { cache: "no-cache" }).then(r => r && r.ok && c.put("./reels.html", r)).catch(() => {}); return hit; } }
   try { const res = await fetch(req); if (res && res.ok && req.mode === "navigate" && /\/(index\.html)?$/.test(new URL(req.url).pathname)) c.put("./index.html", res.clone());   /* only the app page itself is the offline fallback, never stats.html */ return res; }
   catch { return (/reels\.html$/.test(new URL(req.url).pathname) && (await c.match("./reels.html"))) || (await c.match("./index.html")) || (await c.match("./")) || Response.error(); }
 }
