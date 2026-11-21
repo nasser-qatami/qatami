@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>مقاطع · نبأ عظيم</title><meta name="theme-color" content="#0E0B07">
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>مقاطع · نبأ عظيم</title><meta name="theme-color" content="#F5EDDB">
 <style>
 @font-face{font-family:Hafs;src:url(fonts/hafs.otf)}@font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/ruqaa700.woff2)}
 @font-face{font-family:Cairo;font-weight:400;src:url(fonts/cairo400.woff2)}@font-face{font-family:Cairo;font-weight:600;src:url(fonts/cairo600.woff2)}
@@ -115,6 +115,38 @@ body{font-family:Cairo,sans-serif;color:var(--ink)}
 .reel.vd .prog{margin-bottom:0}
 .reel.vd .row{margin-top:7px;gap:6px}.reel.vd .ib{width:34px;border-radius:10px}.reel.vd .ib svg{width:16px;height:16px}
 .reel.vd .full{padding:6px;font-size:11.5px;border-radius:10px}
+
+/* ---- day theme ---- */
+:root{--ink:#3A2A12;--mute:#7A6338}
+html,body{background:#F5EDDB}
+#feed{background:#F5EDDB}
+.reel{background:#F5EDDB}
+.reel.au{background:radial-gradient(120% 70% at 50% 0%,#FFFDF6 0%,#F5EDDB 60%,#EBDFC4 100%)}
+.reel.au .lat{opacity:.9}
+.reel.au .lat rect{filter:none}
+.reel.au .star{color:#B8913A;opacity:.13}
+.reel.au .glow{background:radial-gradient(70% 60% at 50% 100%,rgba(184,145,58,.22),transparent)}
+.reel .frm{background:linear-gradient(160deg,#8F6A22,rgba(184,145,58,.25) 30%,rgba(184,145,58,.25) 70%,#6E4F14) border-box}
+.reel .frm svg{color:#8F6A22;filter:drop-shadow(0 0 4px rgba(143,106,34,.25))}
+.reel .pill{color:#6E4F14;background:rgba(255,253,246,.72);border-color:rgba(143,106,34,.45)}
+.reel .nm{color:#6B5532;background:rgba(255,253,246,.65)}
+.reel .sn,.reel.act .sn{background-image:linear-gradient(180deg,#A07A2A 15%,#7E5C1A 55%,#5C4210 95%)!important;background-size:100% 100%!important;animation:none!important;-webkit-background-clip:text;background-clip:text;color:transparent}
+.reel .sn small{-webkit-text-fill-color:#7A6338;color:#7A6338}
+.reel .glass{background:linear-gradient(160deg,rgba(255,253,246,.9),rgba(245,237,219,.86));border-color:rgba(143,106,34,.4);box-shadow:0 24px 40px -22px rgba(110,79,20,.55),inset 0 1px 0 #fff,inset 0 0 0 4px rgba(143,106,34,.05)}
+.reel .who{color:#7A6338}.reel .who b{color:#3A2A12}
+.reel .tm{color:#7A6338}
+.reel .prog{background:rgba(110,79,20,.15)}.reel .prog i{background:linear-gradient(90deg,#8F6A22,#C9A24B);box-shadow:none}
+.full{color:#6E4F14;background:rgba(201,162,75,.16);border-color:rgba(143,106,34,.5)}
+.ib{color:#3A2A12;background:rgba(255,253,246,.7);border-color:rgba(143,106,34,.35)}
+.ib.on{color:#8F6A22}.ib.on svg{fill:#8F6A22}
+.ay{color:rgba(58,42,18,.3);text-shadow:none}
+.ay i{color:#8F6A22}
+.ay .l.dn{color:#3A2A12;text-shadow:none}
+.ay .l.cu{color:#8F6A22;text-shadow:0 0 12px rgba(201,162,75,.7)}
+.dots b{background:rgba(143,106,34,.25)}.dots b.on{background:#8F6A22}
+.reel.vd::before{background:linear-gradient(180deg,rgba(245,237,219,.45),transparent 22%,transparent 55%,rgba(245,237,219,.55) 92%)}
+.pz{background:rgba(255,253,246,.7);border-color:rgba(143,106,34,.4)}.pz svg{fill:#8F6A22}
+.reel::after{opacity:.05}
 
 /* launch: the button blooms, the panel lifts away, the picture dims */
 .reel.launch .full{background:linear-gradient(135deg,#8F6A22,#E3C36A 50%,#B8913A);color:#2A1D08;border-color:#FFE9A8;box-shadow:0 0 0 0 rgba(245,220,150,.6);animation:lbl .5s ease-out}
