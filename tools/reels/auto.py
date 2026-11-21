@@ -21,7 +21,7 @@ AR = lambda n: str(n).translate(str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨�
 ap = argparse.ArgumentParser()
 ap.add_argument("--max", type=int, default=3)
 ap.add_argument("--days", type=int, default=45)
-ap.add_argument("--min", type=float, default=3, help="minimum score for a stats moment (rewind=1, mark=2)")
+ap.add_argument("--min", type=float, default=2, help="minimum score for a stats moment (rewind=1, mark=2)")
 ap.add_argument("--dry", action="store_true")
 A = ap.parse_args()
 
