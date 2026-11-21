@@ -219,8 +219,10 @@ A.addEventListener('ended',()=>{const n=secs[cur+1];if(n)n.scrollIntoView({behav
 function go(i){if(i===cur)return;secs.forEach((x,j)=>{if(j!==i){x.classList.remove('act','play','paused');x._v&&x._v.pause()}});cur=i;const el=secs[i],r=D[i];el.classList.add('act');
  A.src=r.aud;A.currentTime=0;if(el._v){el._v.currentTime=0}el._tick();play();S('rl/v/'+r.k,'سورة '+r.surah);history.replaceState(null,'','#'+r.k);try{H&&H.at&&H.at(r.k)}catch{}}
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.6)go(secs.indexOf(e.target))}),{threshold:[.6]});
-{const k=location.hash.slice(1),i=D.findIndex(r=>r.k===k);if(i>0)secs[i].scrollIntoView();}
-setTimeout(()=>secs.forEach(x=>io.observe(x)),60);
+let started=false;
+function start(k){if(started)return;started=true;const i=D.findIndex(r=>r.k===k);if(i>0)secs[i].scrollIntoView();setTimeout(()=>secs.forEach(x=>io.observe(x)),60)}
+if(location.hash!=='#warm')start(location.hash.slice(1));
+addEventListener('message',e=>{if(e.data&&e.data.t==='show')start(e.data.k&&e.data.k.replace(/^#/,''))});
 addEventListener('message',e=>{if(e.data==='reels-pause'){A.pause();secs[cur]&&secs[cur]._v&&secs[cur]._v.pause()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){A.pause();secs[cur]&&secs[cur]._v&&secs[cur]._v.pause()}});
 (function loop(){const a=secs[cur];if(a&&!A.paused)a._tick();requestAnimationFrame(loop)})();

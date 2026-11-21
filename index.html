@@ -1120,6 +1120,7 @@ body.reels .toast{z-index:40;bottom:auto;top:calc(env(safe-area-inset-top,0px) +
 .annr .acts{display:flex;align-items:center;justify-content:space-between;gap:10px}.annr .pv{font-size:.7rem;color:#9C865C}
 
 /* ---- reels -> full night: the clip closes like an iris toward the player ---- */
+#reels.warm{visibility:hidden;pointer-events:none;z-index:-1}
 #reels[data-go]{pointer-events:none;overflow:hidden;will-change:transform,opacity;transform-origin:50% 50%}
 body .player{animation:none}
 li.hl{animation:rHl 2.6s ease-out}
@@ -2600,11 +2601,19 @@ function route() {
 }
 
 /* ---- reels ---- */
+function reelWarm() {
+  if (document.getElementById("reels") || document.body.classList.contains("reels")) return;
+  const box = document.createElement("div"); box.id = "reels"; box.className = "warm";
+  box.innerHTML = `<button class="rx" aria-label="إغلاق النفحات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><iframe title="نفحات" allow="autoplay; fullscreen" src="reels.html#warm"></iframe>`;
+  box.querySelector(".rx").addEventListener("click", () => navigate(""));
+  document.body.appendChild(box);
+}
 function reelsSync(k) {
   let box = document.getElementById("reels");
-  if (k === null) { if (box) { document.body.classList.remove("reels"); if (!box.dataset.go) box.remove(); } if (reelAudio) { reelAudio.pause(); reelAudio.removeAttribute("src"); reelAudio = null; } return; }
+  if (k === null) { if (box) { document.body.classList.remove("reels"); if (!box.dataset.go) box.remove(); } if (reelAudio) { reelAudio.pause(); reelAudio.removeAttribute("src"); reelAudio = null; } reelUnlocked = false; setTimeout(reelWarm, 1500); return; }
   document.body.classList.add("reels");
   try { audio.pause(); } catch {}
+  if (box && box.classList.contains("warm")) { box.classList.remove("warm"); try { box.querySelector("iframe").contentWindow.postMessage({ t: "show", k }, "*"); } catch {} return; }
   if (box) return;
   box = document.createElement("div"); box.id = "reels";
   box.innerHTML = `<button class="rx" aria-label="إغلاق النفحات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><iframe title="مقاطع" allow="autoplay; fullscreen" src="reels.html${k ? "#" + encodeURIComponent(k) : ""}"></iframe>`;
@@ -2612,12 +2621,12 @@ function reelsSync(k) {
   document.body.appendChild(box);
 }
 /* warm up the clips page while the home page is idle, so the tab opens at once */
-setTimeout(() => { try { fetch("reels.json", { cache: "no-cache" }).catch(() => {}); ["hafs.otf", "ruqaa700.woff2", "cairo400.woff2", "cairo600.woff2"].forEach(f => fetch("fonts/" + f).catch(() => {})); fetch("reels.html").catch(() => {}); } catch {} }, 2500);
-let reelAudio = null;
+setTimeout(() => { try { fetch("reels.json", { cache: "no-cache" }).catch(() => {}); ["hafs.otf", "ruqaa700.woff2", "cairo400.woff2", "cairo600.woff2"].forEach(f => fetch("fonts/" + f).catch(() => {})); reelWarm(); } catch {} }, 2500);
+let reelAudio = null, reelUnlocked = false;
 /* iPhone only lets sound start from a tap. The tap on «نفحات» happens here, not inside the clips page,
    so the shared player for the clips is created and unlocked here, during that tap, and handed to the page. */
 function reelUnlock() {
-  if (reelAudio) return; reelAudio = new Audio(); reelAudio.preload = "auto"; reelAudio.setAttribute("playsinline", "");
+  if (reelUnlocked) return; reelUnlocked = true; if (!reelAudio) reelAudio = new Audio(); reelAudio.preload = "auto"; reelAudio.setAttribute("playsinline", "");
   reelAudio.src = "data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA"; const p = reelAudio.play(); if (p) p.then(() => { if (reelAudio && reelAudio.src.startsWith("data:")) reelAudio.pause(); }).catch(() => {});
 }
 document.addEventListener("click", e => { if (e.target.closest('a[href="#reels"],a[href^="#reels-"]')) reelUnlock(); }, true);
