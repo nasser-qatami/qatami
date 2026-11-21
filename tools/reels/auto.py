@@ -22,6 +22,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--max", type=int, default=3)
 ap.add_argument("--days", type=int, default=45)
 ap.add_argument("--min", type=float, default=2, help="minimum score for a stats moment (rewind=1, mark=2)")
+ap.add_argument("--marks-only", action="store_true", help="use only mk/ events (every mark becomes a reel candidate, no popularity ranking)")
 ap.add_argument("--dry", action="store_true")
 A = ap.parse_args()
 
@@ -62,6 +63,7 @@ def stats_moments():
         for h in d["hits"]:
             ex.append(h["path_id"])
             m = re.match(r"^(rw|mk)/([^@]+)@(\d+)$", h["path"])
+            if m and A.marks_only and m.group(1) != "mk": continue
             if m: out.append((m.group(2), int(m.group(3)), h["count"] * (2 if m.group(1) == "mk" else 1)))
         if not d.get("more"): break
     # merge neighbouring 10 s buckets of the same recording
