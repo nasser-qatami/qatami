@@ -93,9 +93,9 @@ body{font-family:Cairo,sans-serif;color:var(--ink)}
 .reel .tm span,.meta [data-time]{direction:ltr;unicode-bidi:bidi-override;font-variant-numeric:tabular-nums}
 
 .ay{color:rgba(255,243,207,.34);text-shadow:none}
-.ay span{transition:color .5s,text-shadow .5s}
-.ay span.dn{color:#FFF3CF;text-shadow:0 0 22px rgba(227,195,106,.22)}
-.ay span.cu{color:#F7DE9A;text-shadow:0 0 18px rgba(245,220,150,.75)}
+.ay .l{transition:color .18s,text-shadow .25s}
+.ay .l.dn{color:#FFF3CF;text-shadow:0 0 20px rgba(227,195,106,.2)}
+.ay .l.cu{color:#F7DE9A;text-shadow:0 0 14px rgba(245,220,150,.9),0 0 30px rgba(245,220,150,.45)}
 .reel.au .glass .gt{margin-bottom:16px}
 .reel .prog i{transition:none}
 </style>
@@ -109,12 +109,16 @@ body{font-family:Cairo,sans-serif;color:var(--ink)}
 <svg width="0" height="0" style="position:absolute"><symbol id="pl" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol></svg><main id="feed"></main>
 <script>
 fetch('reels.json',{cache:'no-cache'}).then(r=>r.json()).then(D=>{
+const CL=/[\u0621-\u064A\u0671-\u06D3\u06FA-\u06FF][\u064B-\u065F\u0670\u06D6-\u06ED\u0640]*/g;
+function wordsHtml(a){const W=a.text.split(" ");return W.map((w,x)=>{const ls=w.match(CL)||[w],ts=a.w[x],nx=a.w[x+1],cap=Math.max(.4,.26*ls.length),te=Math.min(nx!==undefined?nx:ts+cap,ts+cap);
+  const wt=ls.map((l,i)=>(/^[\u0627\u0622\u0648\u064A\u0649]/.test(l)&&!/[\u064E\u064F\u0650\u0651\u0652\u0653]/.test(l.slice(1))?1.7:1)*(i===ls.length-1?1.4:1)),sum=wt.reduce((p,q)=>p+q,0);let acc=0;
+  return ls.map((l,i)=>{const t=ts+(te-ts)*acc/sum;acc+=wt[i];return`<span class="l" data-t="${t.toFixed(2)}">${l}</span>`}).join("")}).join(" ")}
 const bars=Array.from({length:34},(_,i)=>`<b style="--h:${8+Math.round(Math.abs(Math.sin(i*1.7)*Math.cos(i*.6))*26)}px;animation-delay:${(i%9)*-.13}s"></b>`).join("");
 const ib=(i,c,l)=>`<button class="ib ${c}" aria-label="${l}"><svg><use href="#${i}"/></svg></button>`;
 const AR=n=>String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
 const fmt=s=>AR(Math.floor(s/60))+":"+AR(String(Math.floor(s%60)).padStart(2,"0"));
 document.getElementById("feed").innerHTML=D.map((r,i)=>{
- const ay=r.ay.map((a,j)=>`<div class="ay" data-t="${a.t}">${a.text.split(" ").map((w,x)=>`<span data-w="${a.w[x]}">${w}</span>`).join(" ")}<i>﴿${AR(a.n)}﴾</i></div>`).join("");
+ const ay=r.ay.map((a,j)=>`<div class="ay" data-t="${a.t}">${wordsHtml(a)}<i>﴿${AR(a.n)}﴾</i></div>`).join("");
  const head=`<div class="hd"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="nm">${i+1} / ${D.length}</div></div>`;
  const meta=`<div class="meta"><span><b>الشيخ ناصر القطامي</b> · ${r.src}</span><span data-time>${fmt(0)}</span></div>`;
  const full=`<div class="row">${ib('hr','lk','أعجبني')}${ib('mk','mk','علامة')}${ib('sh','sh','مشاركة')}<button class="full">اسمع الليلة كاملة</button></div>`;
@@ -134,10 +138,10 @@ const A=(H&&H.audio&&H.audio())||new Audio();A.preload='auto';let cur=-1,needTap
 const secs=[...document.querySelectorAll('.reel')];
 secs.forEach((el,i)=>{const r=D[i];
  el.insertAdjacentHTML('beforeend','<div class="pz"><svg><use href="#pl"/></svg></div>');
- const v=el.querySelector('video'),prog=el.querySelector('.prog i'),tm=el.querySelector('[data-time]'),ays=[...el.querySelectorAll('.ay')],dots=[...el.querySelectorAll('.dots b')],wsp=ays.map(a=>[...a.querySelectorAll('span')]);
+ const v=el.querySelector('video'),prog=el.querySelector('.prog i'),tm=el.querySelector('[data-time]'),ays=[...el.querySelectorAll('.ay')],dots=[...el.querySelectorAll('.dots b')],wsp=ays.map(a=>[...a.querySelectorAll('.l')].map(l=>[l,+l.dataset.t]));
  el._v=v;
  el._tick=()=>{const c=A.currentTime||0;
-  wsp.forEach(L=>L.forEach((w,x)=>{const t=+w.dataset.w,n=L[x+1];w.classList.toggle('dn',t<=c-.05);w.classList.toggle('cu',t<=c&&(!n||+n.dataset.w>c))}));
+  wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.6)})});
   prog.style.width=Math.min(100,c/r.dur*100)+'%';tm.textContent=fmt(c);
   let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
   if(v&&!A.paused&&Math.abs(v.currentTime-c)>.3)v.currentTime=c};
