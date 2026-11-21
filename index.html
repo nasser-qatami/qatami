@@ -2565,7 +2565,7 @@ function reelsSync(k) {
   try { audio.pause(); } catch {}
   if (box) return;
   box = document.createElement("div"); box.id = "reels";
-  box.innerHTML = `<button class="rx" aria-label="إغلاق المقاطع"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><iframe title="مقاطع" allow="autoplay; fullscreen" src="reels.html${k ? "#" + encodeURIComponent(k) : ""}"></iframe>`;
+  box.innerHTML = `<button class="rx" aria-label="إغلاق المقاطع"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><iframe title="مقاطع" allow="autoplay; fullscreen" src="reels.html?v=${Date.now()}${k ? "#" + encodeURIComponent(k) : ""}"></iframe>`;
   box.querySelector(".rx").addEventListener("click", () => navigate(""));
   document.body.appendChild(box);
 }
