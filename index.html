@@ -2823,7 +2823,14 @@ function statView() {
     const d = audio.currentTime - lastT; lastT = audio.currentTime;
     if (d > 0 && d < 3) { acc += d; if (acc >= 60) { acc -= 60; stat("min/" + r.key, r.title); listenMin(); } }
   });
-  audio.addEventListener("seeked", () => { lastT = audio.currentTime; });
+  /* highlights signal: going back 3..120 s = "I want to hear that again" (anonymous: track + 10 s bucket only) */
+  let rwAt = 0, okT = 0, okK = "";   /* okT = last position reached by normal playback (not by a jump) */
+  audio.addEventListener("timeupdate", () => { const r = player.cur, c = audio.currentTime; if (!r) return; if (r.key !== okK || (c - okT >= 0 && c - okT < 3)) { okK = r.key; okT = c; } });
+  audio.addEventListener("seeked", () => {
+    const r = player.cur, now = audio.currentTime, back = okT - now;
+    if (r && r.key === okK && back >= 3 && back <= 120 && Date.now() - rwAt > 4000) { rwAt = Date.now(); stat("rw/" + r.key + "@" + Math.floor(now / 10) * 10, r.title); }
+    okT = now; lastT = now;
+  });
   audio.addEventListener("error", () => { const r = player.cur; if (r) stat("err/" + r.key, r.title); });
   audio.addEventListener("ended", () => { const r = player.cur; if (r) stat("end/" + r.key, r.title); });
   /* feature taps */
@@ -3336,7 +3343,7 @@ function mediaSession(r) {
   dlg.addEventListener("click", e => {
     if (e.target.closest("#fpMkAdd")) {
       const r = player.cur; if (!r) return; const t = Math.floor(audio.currentTime || 0), l = marks[r.key] || (marks[r.key] = []);
-      if (!l.some(m => Math.abs(m.t - t) < 2)) { l.push({ t }); l.sort((a, b) => a.t - b.t); saveMarks(); marksNav(); }
+      if (!l.some(m => Math.abs(m.t - t) < 2)) { l.push({ t }); l.sort((a, b) => a.t - b.t); saveMarks(); marksNav(); stat("mk/" + r.key + "@" + Math.floor(t / 10) * 10, r.title); }
       paintMarks(t); const b = q("#fpMkAdd"); b.classList.add("ok"); b.querySelector("span").textContent = "تمت الإضافة ✓"; setTimeout(() => { b.classList.remove("ok"); b.querySelector("span").textContent = "علامة هنا"; }, 1600);
       if (navigator.vibrate) navigator.vibrate(12); return;
     }
