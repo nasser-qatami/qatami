@@ -154,6 +154,16 @@ body.busy .hero .big,body.busy .tile b{opacity:.35}
 .msg[hidden]{display:none}
 .g .gn{display:block;font-family:var(--f-k);font-size:.78rem;color:var(--gold);margin-top:2px}
 .champ .nums b{min-width:2ch}
+
+.mks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.mks div{text-align:center;padding:10px 4px;border:1px solid var(--line);border-radius:16px;background:var(--glass)}
+.mks b{display:block;font-family:var(--f-b);font-size:1.45rem;color:#FBEFC6}.mks span{font-size:.68rem;color:var(--faint)}
+.mks .no b{color:var(--bad)}.mks .ok b{color:#9ED8A6}
+.mk{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:.85rem}
+.mk small{grid-column:1;color:var(--faint);font-size:.7rem}
+.mk .st{grid-row:1/3;grid-column:2;font-size:.72rem;padding:4px 10px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+.mk .st.ok{color:#9ED8A6;border-color:rgba(158,216,166,.35)}.mk .st.no{color:var(--bad);border-color:rgba(235,133,115,.4)}
+.mkn{margin-top:12px;font-size:.72rem;color:var(--faint);line-height:1.7}
 </style>
 </head>
 <body class="busy">
@@ -213,6 +223,11 @@ body.busy .hero .big,body.busy .tile b{opacity:.35}
   <section>
     <div class="h"><h2>الميزات</h2><small>عدد المستخدمين</small></div>
     <div class="feat" id="feat"></div>
+  </section>
+
+  <section>
+    <div class="h"><h2>لحظات معلَّمة</h2><small>هل لها ريل؟</small></div>
+    <div class="panel" id="mkp"><div class="empty">جارٍ التحميل…</div></div>
   </section>
 
   <section>
@@ -417,6 +432,33 @@ let range = 7, loading = false;
 const CK = "qtm-stats-cache-";
 const saveCache = o => { try { localStorage.setItem(CK + range, JSON.stringify(o)); } catch {} };
 const readCache = () => { try { return JSON.parse(localStorage.getItem(CK + range) || "null"); } catch { return null; } };
+/* ---- marked moments and whether a reel already covers each ---- */
+const MK_FROM = "2026-11-21";
+function keyLabel(k) {
+  const m = /^r(\d+):n(\d+)(t?)$/.exec(k); if (m) { let n = m[2], part = ""; if (n.length === 3 && /[12]$/.test(n) && +n.slice(0, 2) > 26) { part = n[2] === "1" ? " · الجزء الأول" : " · الجزء الثاني"; n = n.slice(0, 2); } return (m[3] ? "قيام" : "تراويح") + " ليلة " + dg(+n) + " · رمضان " + dg(m[1]) + "هـ" + part; }
+  return k;
+}
+const dg = x => String(x).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const mmss = t => dg(Math.floor(t / 60)) + ":" + dg(String(Math.floor(t % 60)).padStart(2, "0"));
+async function loadMarks() {
+  const box = $("mkp");
+  try {
+    const [hits, reels] = await Promise.all([allHits(`start=${MK_FROM}T00:00:00Z&end=${iso(new Date(), 1)}`), fetch("reels.json", { cache: "no-store" }).then(r => r.json()).catch(() => [])]);
+    const raw = [];
+    for (const h of hits) { const m = /^mk\/([^@]+)@(\d+)$/.exec(h.path || ""); if (m && h.event) raw.push({ key: m[1], t: +m[2], n: h.count || 0, src: "ناس" }); }
+    try { const mine = JSON.parse(localStorage.getItem("qtm:marks") || "{}"); for (const k in mine) (mine[k] || []).forEach(x => raw.push({ key: k, t: x.t, n: 1, src: "جهازك" })); } catch {}
+    raw.sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : a.t - b.t);
+    const moments = [];
+    for (const r of raw) { const l = moments[moments.length - 1]; if (l && l.key === r.key && r.t - l.t2 <= 25) { l.t2 = r.t; l.n += r.n; if (!l.srcs.includes(r.src)) l.srcs.push(r.src); } else moments.push({ key: r.key, t: r.t, t2: r.t, n: r.n, srcs: [r.src] }); }
+    for (const m of moments) m.reel = reels.find(r => r.key === m.key && m.t2 + 10 > r.off && m.t < r.off + r.dur);
+    moments.sort((a, b) => (!!a.reel - !!b.reel) || b.n - a.n);
+    const done = moments.filter(m => m.reel).length, todo = moments.length - done;
+    if (!moments.length) { box.innerHTML = '<div class="empty">ما فيه علامات مسجّلة بعد</div>'; return; }
+    box.innerHTML = `<div class="mks"><div><b>${dg(moments.length)}</b><span>لحظة معلَّمة</span></div><div class="ok"><b>${dg(done)}</b><span>لها ريل</span></div><div class="no"><b>${dg(todo)}</b><span>بدون ريل</span></div></div>`
+      + moments.map(m => `<div class="mk"><span>${esc(keyLabel(m.key))}</span><small>عند ${mmss(m.t)}${m.t2 - m.t > 5 ? " – " + mmss(m.t2) : ""} · ${dg(m.n)} ${m.n > 2 ? "علامات" : m.n === 2 ? "علامتان" : "علامة"} · ${m.srcs.join(" + ")}</small><span class="st ${m.reel ? "ok" : "no"}">${m.reel ? "ريل: " + esc(m.reel.surah) + " " + esc(m.reel.range) : "بدون ريل"}</span></div>`).join("")
+      + `<div class="mkn">العلامات المتقاربة (خلال ٢٥ ثانية) تُحسب لحظة وحدة. للّي بدون ريل، قل لي «حدّث الريلز» وأسوي لها.${todo ? "" : " كل اللحظات المعلَّمة لها ريلات."}</div>`;
+  } catch (e) { box.innerHTML = '<div class="empty">تعذر تحميل العلامات</div>'; }
+}
 const WHY = { auth: "مفتاح القراءة ما عاد يشتغل، يحتاج مفتاح جديد من GoatCounter.", net: "ما وصلت لخدمة الإحصاءات (الشبكة أو حاجب إعلانات؟)", json: "رجع رد غريب من خدمة الإحصاءات." };
 function showFrom(hits, prevHits, refs, systems, now) {
   const span = range || Math.max(1, Math.round((new Date(ymd(now)) - new Date(LAUNCH)) / 864e5) + 1), fetchDays = Math.max(span, 7), start = addDays(now, -(fetchDays - 1));
@@ -450,8 +492,8 @@ async function load() {
   loading = false; document.body.classList.remove("busy");
 }
 $("seg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; range = +b.dataset.r; document.querySelectorAll("#seg button").forEach(x => x.classList.toggle("on", x === b)); load(); });
-$("rf").onclick = () => load().then(loadNow);
-load().then(loadNow); setInterval(() => { if (!document.hidden) load(); }, 5 * 60e3); setInterval(() => { if (!document.hidden && !loading) loadNow(); }, 60e3);
+$("rf").onclick = () => load().then(loadNow).then(loadMarks);
+load().then(loadNow).then(loadMarks); setInterval(() => { if (!document.hidden) { load(); loadMarks(); } }, 5 * 60e3); setInterval(() => { if (!document.hidden && !loading) loadNow(); }, 60e3);
 </script>
 </body>
 </html>
