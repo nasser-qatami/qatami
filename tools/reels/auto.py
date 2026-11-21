@@ -120,6 +120,15 @@ def snap(src, t, lo, hi, side):
     return float(max(ts[j0], ts[j1] - 0.35)) if side == "start" else float(min(ts[j1], ts[j0] + 0.45))
 
 
+def end_after(src, e):
+    """End of the last word: whisper's end time is often early when the reciter stretches the last syllable, so go to the first real
+    dip in the sound after it (up to 3 s) and finish 0.35 s into it."""
+    d, ts = env_db(src, e - 0.4, e + 3.3)
+    if d is not None:
+        for t, x in zip(ts, d):
+            if t >= e - 0.2 and x < -18: return float(min(t + 0.35, e + 3.0))
+    return snap(src, e, 0.25, 1.6, "end")
+
 def lead_trim(path, dur):
     """If the clip starts in the middle of sound (the tail of the previous ayah), return how many seconds to cut so it starts in a pause."""
     x = pcm(path, 0, min(dur, 6)); n = int(0.05 * SR); m = len(x) // n
@@ -223,10 +232,10 @@ def build(key, t):
         ms = match(W, sur)
         ch = chain(ms, t)
         if not ch: continue
-        s0 = snap(src, ch[0]["s"], 1.6, 0.25, "start"); e0 = snap(src, ch[-1]["e"], 0.25, 1.6, "end")
+        s0 = snap(src, ch[0]["s"], 1.6, 0.25, "start"); e0 = end_after(src, ch[-1]["e"])
         dur = round(e0 - s0, 2); k = new_id(); out = os.path.join(ROOT, "audio", "reels", k + ".mp3")
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{s0:.2f}", "-t", f"{dur:.2f}", "-i", src, "-vn", "-ac", "2", "-ar", "44100",
-                        "-af", f"afade=t=in:d=0.25,afade=t=out:st={max(0,dur-0.6):.2f}:d=0.6,loudnorm=I=-16:TP=-1.5:LRA=11", "-b:a", "112k", out], check=True, timeout=900)
+                        "-af", f"afade=t=in:d=0.25,afade=t=out:st={max(0,dur-0.3):.2f}:d=0.3,loudnorm=I=-16:TP=-1.5:LRA=11", "-b:a", "112k", out], check=True, timeout=900)
         lt = lead_trim(out, dur)
         if lt > 0.15:
             tmp = out + ".tmp.mp3"
