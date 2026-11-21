@@ -226,7 +226,7 @@ body.busy .hero .big,body.busy .tile b{opacity:.35}
   </section>
 
   <section>
-    <div class="h"><h2>لحظات معلَّمة</h2><small>هل لها ريل؟</small></div>
+    <div class="h"><h2>لحظات معلَّمة</h2><small>هل لها نفحة؟</small></div>
     <div class="panel" id="mkp"><div class="empty">جارٍ التحميل…</div></div>
   </section>
 
@@ -372,7 +372,7 @@ function drawClock(hrs) {
   $("clockNote").innerHTML = max ? `أكثر وقت تشغيل <b class="gt">${hourName(peak)} – ${hourName((peak + 1) % 24)}</b>` : "تظهر أول ما يبدأ الناس يشغّلون";
 }
 function gauge(id, part, whole) { const p = whole ? Math.min(1, part / whole) : 0; const n = $(id + "N"); if (n) n.textContent = whole ? ar(part) + " من " + ar(whole) : "لا بيانات بعد"; $(id).style.setProperty("--len", (p * 314).toFixed(0)); $(id + "T").textContent = whole ? ar(p * 100) + "٪" : "–"; }
-const FEAT = { fav: ["♡", "المفضلة"], offline: ["⤓", "بدون نت"], "video-tag": ["▶", "المرئي"], "sleep-timer": ["☾", "مؤقت النوم"], card: ["▣", "بطاقة التلاوة"], share: ["↗", "المشاركة"], list: ["☰", "القوائم"], mark: ["⌑", "العلامات"], rewind: ["↺", "إعادة مقطع"], reels: ["▷", "مشاهدات المقاطع"], "reel-like": ["♥", "إعجاب بمقطع"], "reel-share": ["↗", "مشاركة مقطع"], "reel-full": ["◉", "فتحوا الليلة كاملة"], theme: ["◐", "تغيير المظهر"], "tour-open": ["✦", "فتحوا الجولة"] };
+const FEAT = { fav: ["♡", "المفضلة"], offline: ["⤓", "بدون نت"], "video-tag": ["▶", "المرئي"], "sleep-timer": ["☾", "مؤقت النوم"], card: ["▣", "بطاقة التلاوة"], share: ["↗", "المشاركة"], list: ["☰", "القوائم"], mark: ["⌑", "العلامات"], rewind: ["↺", "إعادة مقطع"], reels: ["▷", "مشاهدات النفحات"], "reel-like": ["♥", "إعجاب بنفحة"], "reel-share": ["↗", "مشاركة نفحة"], "reel-full": ["◉", "فتحوا الليلة كاملة"], theme: ["◐", "تغيير المظهر"], "tour-open": ["✦", "فتحوا الجولة"] };
 const REF = n => !n ? "رابط مباشر" : /whatsapp|wa\.me/i.test(n) ? "واتساب" : /google/i.test(n) ? "بحث قوقل" : /t\.co|twitter|x\.com/i.test(n) ? "تويتر / X" : /telegram|t\.me/i.test(n) ? "تيليجرام" : /instagram/i.test(n) ? "إنستقرام" : /snapchat/i.test(n) ? "سناب" : /facebook/i.test(n) ? "فيسبوك" : /youtube/i.test(n) ? "يوتيوب" : n;
 const SHADES = ["#FBEFC6", "#E3C36A", "#B98F38", "#6E5220", "#4A3716"];
 function stackHtml(rows) {
@@ -454,9 +454,9 @@ async function loadMarks() {
     moments.sort((a, b) => (!!a.reel - !!b.reel) || b.n - a.n);
     const done = moments.filter(m => m.reel).length, todo = moments.length - done;
     if (!moments.length) { box.innerHTML = '<div class="empty">ما فيه علامات مسجّلة بعد</div>'; return; }
-    box.innerHTML = `<div class="mks"><div><b>${dg(moments.length)}</b><span>لحظة معلَّمة</span></div><div class="ok"><b>${dg(done)}</b><span>لها ريل</span></div><div class="no"><b>${dg(todo)}</b><span>بدون ريل</span></div></div>`
-      + moments.map(m => `<div class="mk"><span>${esc(keyLabel(m.key))}</span><small>عند ${mmss(m.t)}${m.t2 - m.t > 5 ? " – " + mmss(m.t2) : ""} · ${dg(m.n)} ${m.n > 2 ? "علامات" : m.n === 2 ? "علامتان" : "علامة"} · ${m.srcs.join(" + ")}</small><span class="st ${m.reel ? "ok" : "no"}">${m.reel ? "ريل: " + esc(m.reel.surah) + " " + esc(m.reel.range) : "بدون ريل"}</span></div>`).join("")
-      + `<div class="mkn">العلامات المتقاربة (خلال ٢٥ ثانية) تُحسب لحظة وحدة. للّي بدون ريل، قل لي «حدّث الريلز» وأسوي لها.${todo ? "" : " كل اللحظات المعلَّمة لها ريلات."}</div>`;
+    box.innerHTML = `<div class="mks"><div><b>${dg(moments.length)}</b><span>لحظة معلَّمة</span></div><div class="ok"><b>${dg(done)}</b><span>لها نفحة</span></div><div class="no"><b>${dg(todo)}</b><span>بدون نفحة</span></div></div>`
+      + moments.map(m => `<div class="mk"><span>${esc(keyLabel(m.key))}</span><small>عند ${mmss(m.t)}${m.t2 - m.t > 5 ? " – " + mmss(m.t2) : ""} · ${dg(m.n)} ${m.n > 2 ? "علامات" : m.n === 2 ? "علامتان" : "علامة"} · ${m.srcs.join(" + ")}</small><span class="st ${m.reel ? "ok" : "no"}">${m.reel ? "نفحة: " + esc(m.reel.surah) + " " + esc(m.reel.range) : "بدون نفحة"}</span></div>`).join("")
+      + `<div class="mkn">العلامات المتقاربة (خلال ٢٥ ثانية) تُحسب لحظة وحدة. للّي بدون نفحة، قل لي «حدّث النفحات» وأسوي لها.${todo ? "" : " كل اللحظات المعلَّمة لها نفحات."}</div>`;
   } catch (e) { box.innerHTML = '<div class="empty">تعذر تحميل العلامات</div>'; }
 }
 const WHY = { auth: "مفتاح القراءة ما عاد يشتغل، يحتاج مفتاح جديد من GoatCounter.", net: "ما وصلت لخدمة الإحصاءات (الشبكة أو حاجب إعلانات؟)", json: "رجع رد غريب من خدمة الإحصاءات." };

@@ -1,6 +1,6 @@
 <!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><script>(function(){var d=document.documentElement,p;try{p=parent.document.documentElement.getAttribute("data-theme")}catch(e){}
 var dark=p==="dark"||(p!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);if(!dark)d.classList.add("day");
-addEventListener("DOMContentLoaded",function(){var m=document.querySelector("meta[name=theme-color]");if(m)m.content=dark?"#0E0B07":"#F5EDDB"})})()</script><title>مقاطع · نبأ عظيم</title><meta name="theme-color" content="#F5EDDB">
+addEventListener("DOMContentLoaded",function(){var m=document.querySelector("meta[name=theme-color]");if(m)m.content=dark?"#0E0B07":"#F5EDDB"})})()</script><title>نفحات · نبأ عظيم</title><meta name="theme-color" content="#F5EDDB">
 <style>
 @font-face{font-family:Hafs;src:url(fonts/hafs.otf)}@font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/ruqaa700.woff2)}
 @font-face{font-family:Cairo;font-weight:400;src:url(fonts/cairo400.woff2)}@font-face{font-family:Cairo;font-weight:600;src:url(fonts/cairo600.woff2)}
@@ -225,5 +225,5 @@ addEventListener('message',e=>{if(e.data==='reels-pause'){A.pause();secs[cur]&&s
 document.addEventListener('visibilitychange',()=>{if(document.hidden){A.pause();secs[cur]&&secs[cur]._v&&secs[cur]._v.pause()}});
 (function loop(){const a=secs[cur];if(a&&!A.paused)a._tick();requestAnimationFrame(loop)})();
 
-}).catch(()=>{document.getElementById('feed').innerHTML='<p style="padding:40vh 20px;text-align:center;color:#A9987A">تعذر تحميل المقاطع، تأكد من الاتصال.</p>'});
+}).catch(()=>{document.getElementById('feed').innerHTML='<p style="padding:40vh 20px;text-align:center;color:#A9987A">تعذر تحميل النفحات، تأكد من الاتصال.</p>'});
 </script>

@@ -1215,7 +1215,7 @@ li.fy[hidden],.fysec [hidden]{display:none!important}
     <nav class="tabs" aria-label="الأقسام">
       <a href="#" data-nav="home">الرئيسية</a>
       <a href="#ramadan" data-nav="ramadan">ليالي رمضان</a>
-      <a href="#reels" data-nav="reels">مقاطع</a>
+      <a href="#reels" data-nav="reels">نفحات</a>
       <a href="#fard" data-nav="fard">الفروض</a>
       <a href="#mushafs" data-nav="mushafs">الإصدارات</a>
       <a href="#surahs" data-nav="surahs">السور</a>
@@ -1252,7 +1252,7 @@ li.fy[hidden],.fysec [hidden]{display:none!important}
 <nav class="bnav" id="bnav" aria-label="التنقل السريع"><span class="lens" aria-hidden="true"></span>
   <a href="#" data-bn="home"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>الرئيسية</a>
   <a href="#ramadan" data-bn="ramadan"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>رمضان</a>
-  <a href="#reels" data-bn="reels"><svg viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3.5"/><path d="M10.2 9.2v5.6l4.6-2.8z" fill="currentColor"/></svg>مقاطع</a>
+  <a href="#reels" data-bn="reels"><svg viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="3.5"/><path d="M10.2 9.2v5.6l4.6-2.8z" fill="currentColor"/></svg>نفحات</a>
   <a href="#surahs" data-bn="surahs"><svg viewBox="0 0 24 24"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6c2.5-1.5 5.5-1.5 8-.5v13c-2.5-1-5.5-1-8 .5-2.5-1.5-5.5-1.5-8-.5zM12 6v13"/></svg>السور</a>
   <a href="#mine" data-bn="mine"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.3-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5C19 15.7 12 20 12 20Z"/></svg>مكتبتي</a>
 </nav>
@@ -1561,17 +1561,17 @@ const annReels = () => store.get("ann-reels", 0) ? "" : `<section class="newsd a
   <svg class="lat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#nlat)"/></svg>
   <button class="x" data-annx aria-label="إغلاق">×</button>
   <div class="k"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 1l3 5.5L21 5l-1.5 6L24 12l-4.5 1L21 19l-6-1.5L12 23l-3-5.5L3 19l1.5-6L0 12l4.5-1L3 5l6 1.5z"/></svg>ميزة جديدة</div>
-  <h3>علامتك تصير مقطع</h3>
-  <p class="lead">اللحظة اللي تهزّك في التلاوة، علّم عليها. نجمع علاماتكم ونحوّل الأكثر تأثيراً إلى مقاطع قصيرة تبدأ بأول آية وتنتهي بآخرها.</p>
+  <h3>علامتك تصير نفحة</h3>
+  <p class="lead">اللحظة اللي تهزّك في التلاوة، علّم عليها. نجمع علاماتكم ونحوّل الأكثر تأثيراً إلى نفحات قصيرة تبدأ بأول آية وتنتهي بآخرها.</p>
   <div class="flow" aria-hidden="true">
     <div class="st"><i class="ic a"><svg viewBox="0 0 24 24"><path d="M7 3h10v18l-5-4-5 4z"/></svg></i><span>علّم اللحظة</span></div>
     <u></u>
     <div class="st"><i class="ic"><svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="3"/><circle cx="16.5" cy="9.5" r="2.5"/><path d="M2.5 19c.6-3.2 2.8-4.8 5.5-4.8s4.9 1.6 5.5 4.8M14 15c.8-.4 1.6-.6 2.5-.6 2.2 0 3.9 1.3 4.5 4.1"/></svg></i><span>نجمع علاماتكم</span></div>
     <u></u>
-    <div class="st"><i class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.4 9.4v5.2l4.2-2.6z" fill="currentColor"/></svg></i><span>مقطع للجميع</span></div>
+    <div class="st"><i class="ic"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.4 9.4v5.2l4.2-2.6z" fill="currentColor"/></svg></i><span>نفحة للجميع</span></div>
   </div>
-  <blockquote class="hd"><q>من دلّ على خير فله مثل أجر فاعله</q><small>رواه مسلم</small><em>علامتك قد تكون سبب مقطع يسمعه الآلاف. شاركونا الأجر.</em></blockquote>
-  <div class="acts"><a class="go" href="#reels"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l11-6.5z"/></svg>شوف المقاطع</a><span class="pv">بدون أسماء ولا حسابات</span></div></section>`;
+  <blockquote class="hd"><q>من دلّ على خير فله مثل أجر فاعله</q><small>رواه مسلم</small><em>علامتك قد تكون سبب نفحة يسمعها الآلاف. شاركونا الأجر.</em></blockquote>
+  <div class="acts"><a class="go" href="#reels"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l11-6.5z"/></svg>شوف النفحات</a><span class="pv">بدون أسماء ولا حسابات</span></div></section>`;
 const newsCard = () => {
   newsInit(); if (!NEWS.length) return "";
   const f = NEWS[0], rest = NEWS.slice(1, 3);
@@ -2607,14 +2607,14 @@ function reelsSync(k) {
   try { audio.pause(); } catch {}
   if (box) return;
   box = document.createElement("div"); box.id = "reels";
-  box.innerHTML = `<button class="rx" aria-label="إغلاق المقاطع"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><iframe title="مقاطع" allow="autoplay; fullscreen" src="reels.html${k ? "#" + encodeURIComponent(k) : ""}"></iframe>`;
+  box.innerHTML = `<button class="rx" aria-label="إغلاق النفحات"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><iframe title="مقاطع" allow="autoplay; fullscreen" src="reels.html${k ? "#" + encodeURIComponent(k) : ""}"></iframe>`;
   box.querySelector(".rx").addEventListener("click", () => navigate(""));
   document.body.appendChild(box);
 }
 /* warm up the clips page while the home page is idle, so the tab opens at once */
 setTimeout(() => { try { fetch("reels.json", { cache: "no-cache" }).catch(() => {}); ["hafs.otf", "ruqaa700.woff2", "cairo400.woff2", "cairo600.woff2"].forEach(f => fetch("fonts/" + f).catch(() => {})); fetch("reels.html").catch(() => {}); } catch {} }, 2500);
 let reelAudio = null;
-/* iPhone only lets sound start from a tap. The tap on «مقاطع» happens here, not inside the clips page,
+/* iPhone only lets sound start from a tap. The tap on «نفحات» happens here, not inside the clips page,
    so the shared player for the clips is created and unlocked here, during that tap, and handed to the page. */
 function reelUnlock() {
   if (reelAudio) return; reelAudio = new Audio(); reelAudio.preload = "auto"; reelAudio.setAttribute("playsinline", "");
@@ -3839,7 +3839,7 @@ if (lr) { setQueue(lr.c.tracks.map(t => BY_KEY.get(lr.c.id + ":" + t.id)), lr.ke
   /* أربعة فصول، وكل خطوة تضيء عنصرًا حقيقيًا في الصفحة */
   var CH=["اكتشف","يومك","استمع","لك"];
   var STEPS=[
-    {c:0,sel:".bnav",fixed:1,t:"كل الأقسام تحت",p:"الرئيسية، رمضان، <b>مقاطع</b> قصيرة من روائع الليالي، السور، و<b>مكتبتي</b>: فيها مفضلتك وقوائمك وعلاماتك والمحمّل ووِردك."},
+    {c:0,sel:".bnav",fixed:1,t:"كل الأقسام تحت",p:"الرئيسية، رمضان، <b>نفحات</b> قصيرة من روائع الليالي، السور، و<b>مكتبتي</b>: فيها مفضلتك وقوائمك وعلاماتك والمحمّل ووِردك."},
     {c:0,sel:"nav.tabs",top:1,t:"كل الأقسام هنا",p:"ليالي رمضان، الفروض، السور، الإصدارات، ووِردك. <b>اسحب الشريط</b> لتشوف الباقي."},
     {c:0,sel:"label.search",top:1,t:"ابحث بكلامك",p:"اكتب اسم السورة أو السنة أو الليلة، والموقع يفهمك.",chips:["ليلة ٢٧","الكهف ١٤٤٤","فجر"]},
     {c:0,sel:".doors",t:"ليالي رمضان والفروض",p:"اضغط أي باب وتنفتح لك السنين، وداخل كل سنة الليالي <b>ليلةً ليلة</b>."},
