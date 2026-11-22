@@ -267,7 +267,7 @@ function countTo(e, to, fmt) { fmt = fmt || ar; const t0 = performance.now(), d 
 /* ---- data ---- */
 let lastCall = 0;
 async function api(path, tries = 4) {
-  const at = Math.max(Date.now(), lastCall + 260); lastCall = at; const wait = at - Date.now(); if (wait > 0) await sleep(wait);   /* the service allows 4 requests a second; each call reserves its own slot so parallel loads stay in line */
+  const at = Math.max(Date.now(), lastCall + 250); lastCall = at; const wait = at - Date.now(); if (wait > 0) await sleep(wait);   /* the service allows 4 requests a second; each call reserves its own slot so parallel loads stay in line */
   let r;
   try { r = await fetch(API + path, { mode: "cors", credentials: "omit", cache: "no-store", headers: { Authorization: "Bearer " + TOKEN, "Content-Type": "application/json" } }); }
   catch (e) { if (tries > 1) { await sleep(900 * (5 - tries)); return api(path, tries - 1); } throw new Error("net"); }   /* no answer at all: phone network, blocker or the service is busy */
@@ -278,21 +278,27 @@ async function api(path, tries = 4) {
 }
 /* The service refuses very long addresses (about 330 excluded paths). One day at a time stays far below that,
    so the range is fetched day by day and merged; finished days are remembered while the page is open. */
-const DK = "qtm-stats-days-";
+const DK = "qtm-stats-days2-";
 const DAYC = new Map(), INF = new Map();
+let SNAPREADY = null;
 try { const o = JSON.parse(localStorage.getItem(DK) || "{}"), lim = Date.now() - 50 * 864e5; for (const k in o) if (o[k].t > lim) DAYC.set(k, o[k].h); } catch {}
+/* finished days also ship with the site (tools/stats/snapshot.py), so a first visit does not have to fetch them one by one */
+SNAPREADY = fetch("stats-days.json", { cache: "no-cache" }).then(r => r.ok ? r.json() : {}).then(o => { for (const k in o) if (!DAYC.has(k)) DAYC.set(k, o[k]); }).catch(() => {});
 let dsaveT = 0;
 function saveDays() { clearTimeout(dsaveT); dsaveT = setTimeout(() => { try { const o = {}; DAYC.forEach((h, k) => { o[k] = { t: Date.now(), h }; }); localStorage.setItem(DK, JSON.stringify(o)); } catch { try { localStorage.removeItem(DK); } catch {} } }, 800); }
 async function pageHits(q) {
-  let out = [], ex = [];
-  for (let i = 0; i < 12; i++) {
-    const d = await api("stats/hits?limit=100&" + q + ex.map(id => "&exclude_paths=" + id).join(""));
-    out = out.concat(d.hits || []); if (!d.more || !(d.hits || []).length || out.length > 300) break;
-    ex = out.map(h => h.path_id);
+  /* the excluded ids go in ONE comma-separated parameter: repeating the parameter was silently ignored past a few ids,
+     which returned the same top paths again and again (and counted them again) */
+  let out = [], seen = new Set();
+  for (let i = 0; i < 30; i++) {
+    const d = await api("stats/hits?limit=100&" + q + (out.length ? "&exclude_paths=" + out.map(h => h.path_id).join(",") : ""));
+    const fresh = (d.hits || []).filter(h => !seen.has(h.path_id)); fresh.forEach(h => seen.add(h.path_id)); out = out.concat(fresh);
+    if (!d.more || !fresh.length) break;
   }
   return out;
 }
 async function allHits(q) {
+  await SNAPREADY;
   const m = /start=([^&]+)&end=([^&]+)/.exec(q), s0 = new Date(m[1]), e0 = new Date(m[2]), merged = new Map(), nowT = Date.now();
   for (let d = s0, k = 0; d <= e0 && k < 120; d = addDays(d, 1), k++) {
     const cs = iso(d), ce = addDays(d, 1) > e0 ? m[2] : iso(d, 1), key = cs + ce, fin = new Date(ce).getTime() < nowT - 36e5;
@@ -432,7 +438,7 @@ async function loadNow() {
 
 /* ---- load ---- */
 let range = 7, loading = false;
-const CK = "qtm-stats-cache-";
+const CK = "qtm-stats-cache2-";
 const saveCache = o => { try { localStorage.setItem(CK + range, JSON.stringify(o)); } catch {} };
 const readCache = () => { try { return JSON.parse(localStorage.getItem(CK + range) || "null"); } catch { return null; } };
 /* ---- marked moments and whether a reel already covers each ---- */
@@ -447,7 +453,7 @@ async function loadMarks() {
   const box = $("mkp");
   if (!box.dataset.fresh) { try { const c = localStorage.getItem("qtm-stats-marks"); if (c) box.innerHTML = c; } catch {} }
   try {
-    const [hits, reels] = await Promise.all([allHits(`start=${MK_FROM}T00:00:00Z&end=${iso(new Date(), 1)}`), fetch("reels.json", { cache: "no-store" }).then(r => r.json()).catch(() => [])]);
+    const [hits, reels] = await Promise.all([allHits(`start=${iso(new Date(MK_FROM + "T00:00:00"))}&end=${iso(new Date(), 1)}`), fetch("reels.json", { cache: "no-store" }).then(r => r.json()).catch(() => [])]);
     const raw = [];
     for (const h of hits) { const m = /^mk\/([^@]+)@(\d+)$/.exec(h.path || ""); if (m && h.event) raw.push({ key: m[1], t: +m[2], n: h.count || 0, src: "ناس" }); }
     try { const mine = JSON.parse(localStorage.getItem("qtm:marks") || "{}"); for (const k in mine) (mine[k] || []).forEach(x => raw.push({ key: k, t: x.t, n: 1, src: "جهازك" })); } catch {}
@@ -480,11 +486,15 @@ async function load() {
     const span = range || Math.max(1, Math.round((new Date(ymd(now)) - new Date(LAUNCH)) / 864e5) + 1), fetchDays = Math.max(span, 7), start = addDays(now, -(fetchDays - 1)), end = now;
     const hits = await allHits(`start=${iso(start)}&end=${iso(end, 1)}`);   /* the only call the page cannot do without */
     let prev = null, refs = [], systems = [];
-    if (range) { const ps = addDays(start, -span + (fetchDays - span)), pe = addDays(now, -span); try { prev = await allHits(`start=${iso(ps)}&end=${iso(pe, 1)}`); } catch {} }
+    showFrom(hits, null, refs, systems, now);   /* paint as soon as the main numbers are in; the extras follow */
+    $("upd").textContent = "آخر تحديث " + now.toLocaleTimeString("ar-SA-u-nu-arab", { hour: "numeric", minute: "2-digit" });
     const q = `start=${iso(addDays(now, -(span - 1)))}&end=${iso(end, 1)}`;
-    try { refs = (await api("stats/toprefs?" + q)).stats || []; } catch {}
-    try { systems = (await api("stats/systems?" + q)).stats || []; } catch {}
-    showFrom(hits, prev, refs, systems, now);
+    const ps = addDays(start, -span + (fetchDays - span)), pe = addDays(now, -span);
+    [prev, refs, systems] = await Promise.all([
+      range ? allHits(`start=${iso(ps)}&end=${iso(pe, 1)}`).catch(() => null) : null,
+      api("stats/toprefs?" + q).then(r => r.stats || []).catch(() => []),
+      api("stats/systems?" + q).then(r => r.stats || []).catch(() => [])]);
+    if (prev || refs.length || systems.length) showFrom(hits, prev, refs, systems, now);
     saveCache({ t: now.getTime(), hits, prev, refs, systems });
     $("upd").textContent = "آخر تحديث " + now.toLocaleTimeString("ar-SA-u-nu-arab", { hour: "numeric", minute: "2-digit" });
   } catch (e) {
