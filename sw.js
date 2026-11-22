@@ -1,5 +1,5 @@
 /* Service worker: lets the site open and play saved recitations without internet. */
-const APP = "qtm-app-v30", AUD = "qtm-audio-v1";
+const APP = "qtm-app-v31", AUD = "qtm-audio-v1";
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(APP).then(c => Promise.all(["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./img/portrait.webp", "./img/door-ramadan.jpg", "./img/door-fard.jpg", "./fonts/naskh400.woff2", "./fonts/naskh700.woff2", "./fonts/cairo400.woff2", "./fonts/cairo500.woff2", "./fonts/cairo600.woff2", "./fonts/hafs.otf", "./fonts/ruqaa700.woff2", "./reels.html"].map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
 });
