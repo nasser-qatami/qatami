@@ -45,7 +45,13 @@ while True:
     if e.astimezone(datetime.timezone.utc) > now - datetime.timedelta(hours=2): break
     key = cs + ce
     if key not in res:
-        res[key] = [slim(h) for h in page_hits("start=%s&end=%s" % (cs, ce))]
+        q = "start=%s&end=%s" % (cs, ce)
+        hits = page_hits(q)
+        tot = json.load(urllib.request.urlopen(urllib.request.Request(API.replace("stats/hits?", "stats/total?") + q, headers={"Authorization": "Bearer " + TOKEN}), timeout=60))["total"]
+        got = sum(h.get("count", 0) for h in hits)
+        if got != tot or len({h["path_id"] for h in hits}) != len(hits):
+            raise SystemExit("%s: paths add up to %d but GoatCounter's total is %d, not saved" % (d, got, tot))
+        res[key] = [slim(h) for h in hits]
         print(d, len(res[key]), flush=True)
     d += datetime.timedelta(days=1)
 json.dump(res, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
