@@ -262,7 +262,13 @@ for (let k = 0; k < 8; k++) el("rect", { x: -62, y: -62, width: 124, height: 124
 for (const r of [94, 88, 40]) el("circle", { r }, $("st"));
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12 });
 document.querySelectorAll("section").forEach(s => io.observe(s));
-function countTo(e, to, fmt) { fmt = fmt || ar; const t0 = performance.now(), d = 1200; (function f(t) { const p = Math.min(1, (t - t0) / d); e.textContent = fmt(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(f); else e.textContent = fmt(to); })(t0); }
+/* counts from what is already on screen, so a second paint (when the extras arrive) does not restart from zero */
+function countTo(e, to, fmt) { fmt = fmt || ar; const from = e._v || 0, tok = (e._tok || 0) + 1; e._tok = tok; e._v = to;
+  if (Math.abs(to - from) < 1e-9) { e.textContent = fmt(to); return; }
+  const t0 = performance.now(), d = from ? 700 : 1200; (function f(t) { if (e._tok !== tok) return; const p = Math.min(1, (t - t0) / d); e.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(f); else e.textContent = fmt(to); })(t0); }
+/* the same drawing is not drawn (and animated) again */
+function same(e, v) { const k = JSON.stringify(v); if (e._sig === k) return true; e._sig = k; return false; }
+const setHtml = (e, h) => { if (e._h !== h) { e._h = h; e.innerHTML = h; } };
 
 /* ---- data ---- */
 let lastCall = 0;
@@ -358,6 +364,7 @@ function digest(hits, days) {
 /* ---- drawing ---- */
 const WD = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 function drawArea(vals, days) {
+  if (same($("area"), [vals, days])) return;
   const svg = $("area"); svg.textContent = "";
   const W = 320, top = 44, bot = 138, max = Math.max(1, ...vals), n = vals.length;
   const pts = vals.map((v, i) => [n === 1 ? W / 2 : 8 + i * (W - 16) / (n - 1), bot - (v / max) * (bot - top)]);
@@ -381,6 +388,7 @@ function drawArea(vals, days) {
 }
 const hourName = h => { const x = h % 12 || 12; return ar(x) + (h < 12 ? " ص" : " م"); };
 function drawClock(hrs) {
+  if (same($("clock"), hrs)) return;
   const svg = $("clock"); svg.textContent = ""; const max = Math.max(...hrs), peak = hrs.indexOf(max);
   const df = el("defs", {}, svg), g = el("linearGradient", { id: "rg", x1: 0, y1: 1, x2: 0, y2: 0 }, df); el("stop", { "stop-color": "#8F6A22" }, g); el("stop", { offset: 1, "stop-color": "#FBEFC6" }, g);
   el("circle", { r: 52, fill: "none", stroke: "rgba(227,195,106,.25)" }, svg); el("circle", { r: 140, fill: "none", stroke: "rgba(227,195,106,.1)", "stroke-dasharray": "1 6" }, svg);
@@ -415,10 +423,10 @@ function render(D, P, days, refs, systems, range) {
   $("chartSub").textContent = range === 1 ? "آخر ٧ أيام" : "الزوار كل يوم"; drawArea(cv, cd);
   /* top recitations */
   const tr = [...D.tracks.values()].filter(t => t.listeners || t.plays).sort((a, b) => b.listeners - a.listeners || b.plays - a.plays).slice(0, 5);
-  if (!tr.length) $("top").innerHTML = '<div class="panel"><div class="empty">ما فيه استماع في هذي الفترة بعد</div></div>';
+  if (!tr.length) setHtml($("top"), '<div class="panel"><div class="empty">ما فيه استماع في هذي الفترة بعد</div></div>');
   else { const c = tr[0], mx = Math.max(1, c.listeners, c.plays), pc = t => t.plays ? ar(Math.min(100, t.ends / t.plays * 100)) + "٪" : "–";
-    $("top").innerHTML = `<div class="champ"><span class="tag">♛ الأولى</span><div class="name">${esc(c.title)}</div><div class="nums"><div><b>${ar(c.listeners)}</b><span>مستمع</span></div><div><b>${ar(c.plays)}</b><span>تشغيل</span></div><div><b>${pc(c)}</b><span>كمّلوها</span></div></div></div>`
-      + (tr.length > 1 ? `<ol class="rank">${tr.slice(1).map((t, i) => `<li style="--w:${Math.max(6, Math.max(t.listeners, t.plays) / mx * 100)}%"><span class="n">${ar(i + 2)}</span><div class="t">${esc(t.title)}</div><div class="v">${ar(t.listeners)} <i>مستمع</i><small>${ar(t.plays)} تشغيل</small></div></li>`).join("")}</ol>` : ""); }
+    setHtml($("top"), `<div class="champ"><span class="tag">♛ الأولى</span><div class="name">${esc(c.title)}</div><div class="nums"><div><b>${ar(c.listeners)}</b><span>مستمع</span></div><div><b>${ar(c.plays)}</b><span>تشغيل</span></div><div><b>${pc(c)}</b><span>كمّلوها</span></div></div></div>`
+      + (tr.length > 1 ? `<ol class="rank">${tr.slice(1).map((t, i) => `<li style="--w:${Math.max(6, Math.max(t.listeners, t.plays) / mx * 100)}%"><span class="n">${ar(i + 2)}</span><div class="t">${esc(t.title)}</div><div class="v">${ar(t.listeners)} <i>مستمع</i><small>${ar(t.plays)} تشغيل</small></div></li>`).join("")}</ol>` : "")); }
   drawClock(D.hours);
   gauge("gBack", D.back, D.back + D.fresh); gauge("gEnd", D.ten, D.listeners);
   /* features */
@@ -426,7 +434,7 @@ function render(D, P, days, refs, systems, range) {
   const fs = D.feats.filter(f => FEAT[f.key] && f.n).sort((a, b) => b.n - a.n), fm = Math.max(1, ...fs.map(f => f.n));
   let fh = fs.map(f => `<div class="f"><div class="i">${FEAT[f.key][0]}</div><b>${ar(f.n)}</b><span>${FEAT[f.key][1]}</span><div class="m"><u style="--w:${f.n / fm * 100}%"></u></div></div>`).join("");
   if (D.tour.all) fh += `<div class="f"><div class="i">✦</div><b>${ar(D.tour.done / D.tour.all * 100)}٪</b><span>كمّلوا الجولة</span><div class="m"><u style="--w:${D.tour.done / D.tour.all * 100}%"></u></div></div>`;
-  $("feat").innerHTML = fh || '<div class="panel" style="grid-column:1/-1"><div class="empty">لا بيانات بعد</div></div>';
+  setHtml($("feat"), fh || '<div class="panel" style="grid-column:1/-1"><div class="empty">لا بيانات بعد</div></div>');
   /* sources and devices */
   const merge = rows => { const m = new Map(); rows.forEach(r => m.set(r.name, (m.get(r.name) || 0) + r.n)); return [...m].map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n); };
   $("src").innerHTML = stackHtml(merge(refs.map(r => ({ name: REF(r.name), n: r.count })))) + '<div class="sub2">الأجهزة</div>' + stackHtml(merge(systems.map(r => ({ name: r.name || "غير معروف", n: r.count }))));
