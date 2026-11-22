@@ -267,8 +267,7 @@ function countTo(e, to, fmt) { fmt = fmt || ar; const t0 = performance.now(), d 
 /* ---- data ---- */
 let lastCall = 0;
 async function api(path, tries = 4) {
-  const wait = 300 - (Date.now() - lastCall); if (wait > 0) await sleep(wait);   /* the service allows 4 requests a second */
-  lastCall = Date.now();
+  const at = Math.max(Date.now(), lastCall + 260); lastCall = at; const wait = at - Date.now(); if (wait > 0) await sleep(wait);   /* the service allows 4 requests a second; each call reserves its own slot so parallel loads stay in line */
   let r;
   try { r = await fetch(API + path, { mode: "cors", credentials: "omit", cache: "no-store", headers: { Authorization: "Bearer " + TOKEN, "Content-Type": "application/json" } }); }
   catch (e) { if (tries > 1) { await sleep(900 * (5 - tries)); return api(path, tries - 1); } throw new Error("net"); }   /* no answer at all: phone network, blocker or the service is busy */
@@ -279,7 +278,11 @@ async function api(path, tries = 4) {
 }
 /* The service refuses very long addresses (about 330 excluded paths). One day at a time stays far below that,
    so the range is fetched day by day and merged; finished days are remembered while the page is open. */
-const DAYC = new Map();
+const DK = "qtm-stats-days-";
+const DAYC = new Map(), INF = new Map();
+try { const o = JSON.parse(localStorage.getItem(DK) || "{}"), lim = Date.now() - 50 * 864e5; for (const k in o) if (o[k].t > lim) DAYC.set(k, o[k].h); } catch {}
+let dsaveT = 0;
+function saveDays() { clearTimeout(dsaveT); dsaveT = setTimeout(() => { try { const o = {}; DAYC.forEach((h, k) => { o[k] = { t: Date.now(), h }; }); localStorage.setItem(DK, JSON.stringify(o)); } catch { try { localStorage.removeItem(DK); } catch {} } }, 800); }
 async function pageHits(q) {
   let out = [], ex = [];
   for (let i = 0; i < 12; i++) {
@@ -294,7 +297,7 @@ async function allHits(q) {
   for (let d = s0, k = 0; d <= e0 && k < 120; d = addDays(d, 1), k++) {
     const cs = iso(d), ce = addDays(d, 1) > e0 ? m[2] : iso(d, 1), key = cs + ce, fin = new Date(ce).getTime() < nowT - 36e5;
     let hits = DAYC.get(key);
-    if (!hits) { hits = await pageHits(`start=${cs}&end=${ce}`); if (fin) DAYC.set(key, hits); }
+    if (!hits) { let p = INF.get(key); if (!p) { p = pageHits(`start=${cs}&end=${ce}`); INF.set(key, p); p.then(() => INF.delete(key), () => INF.delete(key)); } hits = await p; if (fin) { DAYC.set(key, hits); saveDays(); } }
     for (const h of hits) {
       const o = merged.get(h.path_id);
       if (!o) merged.set(h.path_id, { ...h, stats: [...(h.stats || [])] });
@@ -442,6 +445,7 @@ const dg = x => String(x).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
 const mmss = t => dg(Math.floor(t / 60)) + ":" + dg(String(Math.floor(t % 60)).padStart(2, "0"));
 async function loadMarks() {
   const box = $("mkp");
+  if (!box.dataset.fresh) { try { const c = localStorage.getItem("qtm-stats-marks"); if (c) box.innerHTML = c; } catch {} }
   try {
     const [hits, reels] = await Promise.all([allHits(`start=${MK_FROM}T00:00:00Z&end=${iso(new Date(), 1)}`), fetch("reels.json", { cache: "no-store" }).then(r => r.json()).catch(() => [])]);
     const raw = [];
@@ -457,7 +461,8 @@ async function loadMarks() {
     box.innerHTML = `<div class="mks"><div><b>${dg(moments.length)}</b><span>لحظة معلَّمة</span></div><div class="ok"><b>${dg(done)}</b><span>لها نفحة</span></div><div class="no"><b>${dg(todo)}</b><span>بدون نفحة</span></div></div>`
       + moments.map(m => `<div class="mk"><span>${esc(keyLabel(m.key))}</span><small>عند ${mmss(m.t)}${m.t2 - m.t > 5 ? " – " + mmss(m.t2) : ""} · ${dg(m.n)} ${m.n > 2 ? "علامات" : m.n === 2 ? "علامتان" : "علامة"} · ${m.srcs.join(" + ")}</small><span class="st ${m.reel ? "ok" : "no"}">${m.reel ? "نفحة: " + esc(m.reel.surah) + " " + esc(m.reel.range) : "بدون نفحة"}</span></div>`).join("")
       + `<div class="mkn">العلامات المتقاربة (خلال ٢٥ ثانية) تُحسب لحظة وحدة. للّي بدون نفحة، قل لي «حدّث النفحات» وأسوي لها.${todo ? "" : " كل اللحظات المعلَّمة لها نفحات."}</div>`;
-  } catch (e) { box.innerHTML = '<div class="empty">تعذر تحميل العلامات</div>'; }
+    box.dataset.fresh = "1"; try { localStorage.setItem("qtm-stats-marks", box.innerHTML); } catch {}
+  } catch (e) { if (!box.dataset.fresh && !box.innerHTML.trim()) box.innerHTML = '<div class="empty">تعذر تحميل العلامات</div>'; }
 }
 const WHY = { auth: "مفتاح القراءة ما عاد يشتغل، يحتاج مفتاح جديد من GoatCounter.", net: "ما وصلت لخدمة الإحصاءات (الشبكة أو حاجب إعلانات؟)", json: "رجع رد غريب من خدمة الإحصاءات." };
 function showFrom(hits, prevHits, refs, systems, now) {
@@ -492,8 +497,9 @@ async function load() {
   loading = false; document.body.classList.remove("busy");
 }
 $("seg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; range = +b.dataset.r; document.querySelectorAll("#seg button").forEach(x => x.classList.toggle("on", x === b)); load(); });
-$("rf").onclick = () => load().then(loadNow).then(loadMarks);
-load().then(loadNow).then(loadMarks); setInterval(() => { if (!document.hidden) { load(); loadMarks(); } }, 5 * 60e3); setInterval(() => { if (!document.hidden && !loading) loadNow(); }, 60e3);
+$("rf").onclick = () => { load(); loadNow(); loadMarks(); };
+{ const c = readCache(); if (c) { try { showFrom(c.hits, c.prev, c.refs, c.systems, new Date(c.t)); $("upd").textContent = "آخر أرقام محفوظة، وأحدّثها الحين…"; } catch {} } }
+load(); loadNow(); loadMarks(); setInterval(() => { if (!document.hidden) { load(); loadMarks(); } }, 5 * 60e3); setInterval(() => { if (!document.hidden && !loading) loadNow(); }, 60e3);
 </script>
 </body>
 </html>
