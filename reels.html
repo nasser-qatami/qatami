@@ -237,17 +237,22 @@ secs.forEach((el,i)=>{const r=D[i];
  el.insertAdjacentHTML('beforeend','<div class="pz"><svg><use href="#pl"/></svg></div>');
  const v=el.querySelector('video'),prog=el.querySelector('.prog i'),tm=el.querySelector('[data-time]'),ays=[...el.querySelectorAll('.ay')],dots=[...el.querySelectorAll('.dots b')],wsp=ays.map(a=>[...a.querySelectorAll('.l')].map(l=>[l,+l.dataset.t]));
  el._v=v;
- const tf=el.querySelector('.tfs'),tfh=tf&&tf.querySelector('h4'),tfp=tf&&tf.querySelector('p'),tfb=el.querySelector('.tfb');
+ const tf=el.querySelector('.tfs'),tfh=tf&&tf.querySelector('h4'),tfp=tf&&tf.querySelector('p'),tfb=el.querySelector('.tfb'),tb=tf&&tf.querySelector('.tb');if(tb){const hold=()=>{el._hold=performance.now()+4000};['touchstart','touchmove','wheel','mousedown'].forEach(ev=>tb.addEventListener(ev,hold,{passive:true}))}
  if(tf){const open=o=>{if(o){const bx=el.querySelector('.ayat');if(bx){const R=el.getBoundingClientRect(),B=bx.getBoundingClientRect(),a=bx.querySelector('.ay.on')||bx.querySelector('.ay'),h=a?a.getBoundingClientRect().height:B.height,top=R.top+78,bot=R.bottom-tf.offsetHeight-14,sc=Math.min(.9,(bot-top)/h),cy=(top+bot)/2,by=B.top+B.height/2;el.style.setProperty('--sc',sc.toFixed(3));el.style.setProperty('--ty',(cy-by).toFixed(1)+'px')}}el.classList.toggle('tfo',o);if(o)S('rl/tf/'+r.k,r.surah)};el._tfx=()=>open(false);
   tfb.addEventListener('click',e=>{e.stopPropagation();open(true)});tf.querySelector('.x').addEventListener('click',()=>open(false));
-  let y0=null,dy=0,t0=0,ly=0,lt=0,v=0;const tb=tf.querySelector('.tb'),st=e=>{if(e.target.closest('.tb')&&tb.scrollTop>0)return;y0=ly=e.touches[0].clientY;dy=0;v=0;t0=lt=performance.now()},
+  let y0=null,dy=0,t0=0,ly=0,lt=0,v=0;const st=e=>{if(e.target.closest('.tb')&&tb.scrollTop>0)return;y0=ly=e.touches[0].clientY;dy=0;v=0;t0=lt=performance.now()},
    mv=e=>{if(y0===null)return;const y=e.touches[0].clientY,n=performance.now();v=(y-ly)/Math.max(1,n-lt);ly=y;lt=n;const d=y-y0;dy=d>0?d:-Math.sqrt(-d)*2;tf.classList.add('drag');tf.style.transform='translate3d(0,'+dy+'px,0)'},
    en=()=>{if(y0===null)return;tf.classList.remove('drag');tf.style.transform='';if(dy>70||(v>.45&&dy>10))open(false);y0=null};
   tf.addEventListener('touchstart',st,{passive:true});tf.addEventListener('touchmove',mv,{passive:true});tf.addEventListener('touchend',en);}
  el._tick=()=>{const c=A.currentTime||0;
   wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.9)})});
   prog.style.width=Math.min(100,c/r.dur*100)+'%';tm.textContent=fmt(c);
-  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){const first=el._tk===undefined;el._tk=k;const set=()=>{tfh.innerHTML='سورة '+r.surah+'<span class="md">﴿'+AR(r.ay[k].n)+'﴾</span>';tfp.textContent=r.ay[k].tf||'';tf.querySelector('.tb').scrollTop=0;tfp.classList.remove('sw')};if(first)set();else{tfp.classList.add('sw');setTimeout(set,260)}}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
+  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){const first=el._tk===undefined,same=!first&&r.ay[el._tk]&&r.ay[el._tk].tf===r.ay[k].tf;el._tk=k;const hd=()=>{tfh.innerHTML='سورة '+r.surah+'<span class="md">﴿'+AR(r.ay[k].n)+'﴾</span>'};
+  const set=()=>{hd();tfp.textContent=r.ay[k].tf||'';tb.scrollTop=0;el._sy=0;tfp.classList.remove('sw')};if(first)set();else if(same)hd();else{tfp.classList.add('sw');setTimeout(set,260)}}
+  if(tf&&el.classList.contains('tfo')&&!tfp.classList.contains('sw')&&performance.now()>(el._hold||0)){const room=tb.scrollHeight-tb.clientHeight;if(room>4){
+   let g0=k,g1=k;while(g0>0&&r.ay[g0-1].tf===r.ay[k].tf)g0--;while(g1<r.ay.length-1&&r.ay[g1+1].tf===r.ay[k].tf)g1++;
+   const t0=r.ay[g0].t,t1=g1+1<r.ay.length?r.ay[g1+1].t:r.dur,pr=Math.min(1,Math.max(0,((c-t0)/Math.max(1,t1-t0)-.12)/.72)),tg=pr*room;
+   if(el._sy===undefined||Math.abs(tb.scrollTop-el._sy)>2)el._sy=tb.scrollTop;el._sy+=(tg-el._sy)*.06;tb.scrollTop=el._sy}}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
   if(v&&!A.paused&&Math.abs(v.currentTime-c)>.3)v.currentTime=c};
  el.querySelector('.prog').addEventListener('click',e=>{const b=e.currentTarget.getBoundingClientRect();A.currentTime=Math.max(0,(b.right-e.clientX)/b.width*r.dur);if(v)v.currentTime=A.currentTime});
  let last=0;el.addEventListener('click',e=>{if(e.target.closest('button,.prog,.tfs'))return;if(el.classList.contains('tfo')){el._tfx();return}const now=Date.now();
