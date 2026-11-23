@@ -164,6 +164,7 @@ html.day .reel::after{opacity:.05}
 <svg width="0" height="0" style="position:absolute"><symbol id="pl" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol></svg><main id="feed"></main>
 <script>
 fetch("reels.json",{cache:"no-cache"}).then(r=>r.json()).then(D=>{
+for(let i=D.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[D[i],D[j]]=[D[j],D[i]]} // ترتيب عشوائي كل مرة
 const CL=/[\u0621-\u064A\u0671-\u06D3\u06FA-\u06FF][\u064B-\u065F\u0670\u06D6-\u06ED\u0640]*/g;
 function wordsHtml(a){const W=a.text.split(" ");return W.map((w,x)=>{const ls=w.match(CL)||[w],ts=a.w[x],nx=a.w[x+1],cap=Math.max(.5,.42*ls.length),te=Math.min(nx!==undefined?nx:ts+cap,ts+cap);
   const wt=ls.map((l,i)=>(/^[\u0627\u0622\u0648\u064A\u0649]/.test(l)&&!/[\u064E\u064F\u0650\u0651\u0652\u0653]/.test(l.slice(1))?1.7:1)*(i===ls.length-1?1.4:1)),sum=wt.reduce((p,q)=>p+q,0);let acc=0;
