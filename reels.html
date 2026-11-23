@@ -153,13 +153,32 @@ html.day .reel::after{opacity:.05}
 /* launch: the button blooms, the panel lifts away, the picture dims */
 .reel.launch .full{background:linear-gradient(135deg,#8F6A22,#E3C36A 50%,#B8913A);color:#2A1D08;border-color:#FFE9A8;box-shadow:0 0 0 0 rgba(245,220,150,.6);animation:lbl .5s ease-out}
 @keyframes lbl{0%{box-shadow:0 0 0 0 rgba(245,220,150,.7)}100%{box-shadow:0 0 0 22px rgba(245,220,150,0)}}
-.tf{display:none;margin-bottom:12px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(227,195,106,.22);max-height:190px;overflow:auto;text-align:right}
-.tf h4{margin:0 0 4px;font:600 11.5px Cairo;color:var(--gold)}.tf p{margin:0;font:400 13.5px/1.85 Cairo;color:#EADFBF}.tf small{display:block;margin-top:6px;font:400 10.5px Cairo;color:rgba(234,223,191,.5)}
-.tfb{padding:3px 14px;border-radius:99px;border:1px solid rgba(227,195,106,.4);background:rgba(227,195,106,.08);color:var(--gold);font:600 12px Cairo}
-.reel.tfo .tf{display:block}.reel.tfo .ayat{bottom:480px}
-.reel.au .tm{align-items:center}
-html.day .tf{background:rgba(255,250,235,.75);border-color:rgba(143,106,34,.3)}html.day .tf h4{color:#8F6A22}html.day .tf p{color:#3A2A12}html.day .tf small{color:#7A6338}html.day .tfb{color:#8F6A22;border-color:rgba(143,106,34,.4);background:rgba(143,106,34,.08)}
-.reel.vd .row .tfb{border-radius:10px;font-size:11.5px;padding:0 10px}.reel.vd.tfo .tf{max-height:140px;margin-bottom:8px}
+/* ---- تفسير: ورقة تنزلق من تحت ---- */
+.tfb{position:absolute;top:-15px;left:50%;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:7px;padding:6px 16px 6px 14px;border-radius:99px;border:1px solid rgba(245,220,150,.5);background:linear-gradient(180deg,rgba(60,46,20,.92),rgba(22,16,8,.95));color:var(--gold);font:600 12.5px Cairo;box-shadow:0 8px 20px -6px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.14);white-space:nowrap;transition:transform .25s cubic-bezier(.2,.9,.3,1.2),opacity .3s}
+.tfb svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;animation:nudge 2.4s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.5px)}}
+.tfb:active{transform:translateX(-50%) scale(.94)}
+.tfs{position:absolute;inset-inline:0;bottom:0;height:54%;z-index:7;display:flex;flex-direction:column;padding:10px 24px calc(env(safe-area-inset-bottom,0px) + 22px);border-radius:30px 30px 0 0;
+ background:linear-gradient(180deg,rgba(34,26,13,.9),rgba(12,9,5,.96));backdrop-filter:blur(26px) saturate(1.4);-webkit-backdrop-filter:blur(26px) saturate(1.4);
+ border-top:1px solid rgba(245,220,150,.45);box-shadow:0 -30px 60px -20px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.1);
+ transform:translateY(104%);visibility:hidden;transition:transform .6s cubic-bezier(.22,1,.36,1),visibility 0s .6s;touch-action:none;will-change:transform}
+.reel.tfo .tfs{transform:none;visibility:visible;transition:transform .6s cubic-bezier(.22,1,.36,1),visibility 0s}
+.tfs.drag{transition:none!important}
+.tfs .gr{width:42px;height:4.5px;border-radius:9px;background:rgba(245,220,150,.4);margin:2px auto 12px;flex:none}
+.tfs .th{display:flex;align-items:center;justify-content:space-between;flex:none;padding-bottom:10px;border-bottom:1px solid rgba(245,220,150,.16)}
+.tfs h4{margin:0;font:700 15px Cairo;color:var(--gold)}.tfs h4 small{font:400 11.5px Cairo;color:rgba(234,223,191,.55);margin-inline-start:8px}
+.tfs .x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(245,220,150,.3);background:rgba(255,255,255,.05);color:var(--gold);display:grid;place-items:center}
+.tfs .x svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.tfs .tb{flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 2px 6px;touch-action:pan-y;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 18px),transparent)}
+.tfs p{margin:0;font:400 16px/2.1 Cairo;color:#F1E7C8;transition:opacity .35s,transform .35s;text-wrap:pretty}.tfs p.sw{opacity:0;transform:translateY(6px)}
+.tfs .src{flex:none;padding-top:8px;font:400 11px Cairo;color:rgba(234,223,191,.45);text-align:center}
+.reel .ayat{transition:bottom .6s cubic-bezier(.22,1,.36,1)}
+.reel.tfo .ayat{bottom:calc(54% + 8px)}
+.reel.act.tfo .glass{transform:translateY(40px) scale(.97);opacity:0;pointer-events:none}
+.reel .glass{transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .35s}
+.reel.vd .tfs{height:46%}.reel.vd .tfb{top:-13px;padding:4px 13px 4px 11px;font-size:11.5px}.reel.vd.tfo .top,.reel.vd.tfo .frm{opacity:.0;transition:opacity .4s}
+html.day .tfs{background:linear-gradient(180deg,rgba(252,247,232,.93),rgba(244,236,212,.97));border-top-color:rgba(143,106,34,.5)}html.day .tfs h4{color:#8F6A22}html.day .tfs p{color:#3A2A12}html.day .tfs .src,html.day .tfs h4 small{color:#7A6338}html.day .tfs .x{color:#8F6A22;border-color:rgba(143,106,34,.35)}html.day .tfs .gr{background:rgba(143,106,34,.35)}html.day .tfs .th{border-color:rgba(143,106,34,.2)}
+html.day .tfb{background:linear-gradient(180deg,#FBF4DC,#EADBB0);color:#8F6A22;border-color:rgba(143,106,34,.5)}
 </style>
 <body><svg width="0" height="0" style="position:absolute"><defs>
 <pattern id="lat" width="64" height="64" patternUnits="userSpaceOnUse"><g fill="none" stroke="#E3C36A" stroke-width=".7" opacity=".16"><rect x="16" y="16" width="32" height="32"/><rect x="16" y="16" width="32" height="32" transform="rotate(45 32 32)"/></g></pattern>
@@ -184,11 +203,16 @@ document.getElementById("feed").innerHTML=D.map((r,i)=>{
  const ay=r.ay.map((a,j)=>`<div class="ay" data-t="${a.t}">${wordsHtml(a)}<i>﴿${AR(a.n)}﴾</i></div>`).join("");
  const head=`<div class="hd"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="nm">${i+1} / ${D.length}</div></div>`;
  const meta=`<div class="meta"><span><b>الشيخ ناصر القطامي</b> · ${r.src}</span><span data-time>${fmt(0)}</span></div>`;
- const full=`<div class="row">${ib('hr','lk','أعجبني')}${ib('mk','mk','علامة')}${ib('sh','sh','مشاركة')}${r.video&&r.ay.some(a=>a.tf)?'<button class="tfb">تفسير</button>':''}<button class="full">اسمع الليلة كاملة</button></div>`;
+ const full=`<div class="row">${ib('hr','lk','أعجبني')}${ib('mk','mk','علامة')}${ib('sh','sh','مشاركة')}<button class="full">اسمع الليلة كاملة</button></div>`;
  const dots=r.ay.length>1?`<div class="dots">${r.ay.map(()=>'<b></b>').join('')}</div>`:'';
- if(r.video) return `<section class="reel vd" data-i="${i}"><video src="${r.file}" playsinline muted preload="metadata"></video><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="glass"><div class="tf"><h4></h4><p></p><small>التفسير الميسر</small></div><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span><span>${fmt(r.dur)}</span></div>${full}</div></section>`;
- return `<section class="reel au" data-i="${i}"><svg class="lat" width="100%" height="100%"><rect width="100%" height="100%" fill="url(#lat)"/></svg><svg class="star"><use href="#st"/></svg><div class="glow"></div><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="ayat">${ay}</div>${dots}<div class="glass"><div class="tf"><h4></h4><p></p><small>التفسير الميسر</small></div><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span>${r.ay.some(a=>a.tf)?'<button class="tfb">تفسير</button>':''}<span>${fmt(r.dur)}</span></div>${full}</div></section>`;
+ if(r.video) return `<section class="reel vd" data-i="${i}"><video src="${r.file}" playsinline muted preload="metadata"></video><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="glass"><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span><span>${fmt(r.dur)}</span></div>${full}</div></section>`;
+ return `<section class="reel au" data-i="${i}"><svg class="lat" width="100%" height="100%"><rect width="100%" height="100%" fill="url(#lat)"/></svg><svg class="star"><use href="#st"/></svg><div class="glow"></div><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="ayat">${ay}</div>${dots}<div class="glass"><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span><span>${fmt(r.dur)}</span></div>${full}</div></section>`;
 }).join("");
+const UP='<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>',XX='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+document.querySelectorAll('.reel').forEach((el,i)=>{const r=D[i];if(!r.ay.some(a=>a.tf))return;
+ el.querySelector('.glass').insertAdjacentHTML('afterbegin','<button class="tfb" aria-label="التفسير">'+UP+'تفسير</button>');
+ el.insertAdjacentHTML('beforeend','<div class="tfs" role="dialog" aria-label="التفسير الميسر"><div class="gr"></div><div class="th"><h4></h4><button class="x" aria-label="إغلاق">'+XX+'</button></div><div class="tb"><p></p></div><div class="src">التفسير الميسر · مجمع الملك فهد لطباعة المصحف الشريف</div></div>')});
+
 
 function fit(){document.querySelectorAll('.reel').forEach(r=>{const box=r.querySelector('.ayat');if(!box)return;const H=box.clientHeight;r.querySelectorAll('.ay').forEach(a=>{let f=34;a.style.fontSize=f+'px';while(a.scrollHeight>H&&f>15){f--;a.style.fontSize=f+'px'}})})}
 document.fonts.ready.then(fit);addEventListener('resize',fit);
@@ -202,14 +226,21 @@ const secs=[...document.querySelectorAll('.reel')];
 secs.forEach((el,i)=>{const r=D[i];
  el.insertAdjacentHTML('beforeend','<div class="pz"><svg><use href="#pl"/></svg></div>');
  const v=el.querySelector('video'),prog=el.querySelector('.prog i'),tm=el.querySelector('[data-time]'),ays=[...el.querySelectorAll('.ay')],dots=[...el.querySelectorAll('.dots b')],wsp=ays.map(a=>[...a.querySelectorAll('.l')].map(l=>[l,+l.dataset.t]));
- el._v=v;const tf=el.querySelector('.tf'),tfh=tf&&tf.querySelector('h4'),tfp=tf&&tf.querySelector('p'),tfb=el.querySelector('.tfb');if(tfb)tfb.addEventListener('click',()=>{el.classList.toggle('tfo');fit();S('rl/tf/'+r.k,r.surah)});
+ el._v=v;
+ const tf=el.querySelector('.tfs'),tfh=tf&&tf.querySelector('h4'),tfp=tf&&tf.querySelector('p'),tfb=el.querySelector('.tfb');
+ if(tf){const open=o=>{el.classList.toggle('tfo',o);fit();if(o)S('rl/tf/'+r.k,r.surah)};el._tfx=()=>open(false);
+  tfb.addEventListener('click',e=>{e.stopPropagation();open(true)});tf.querySelector('.x').addEventListener('click',()=>open(false));
+  let y0=null,dy=0;const st=e=>{if(e.target.closest('.tb')&&tf.querySelector('.tb').scrollTop>0)return;y0=e.touches[0].clientY;dy=0},
+   mv=e=>{if(y0===null)return;dy=Math.max(0,e.touches[0].clientY-y0);if(dy>0){tf.classList.add('drag');tf.style.transform='translateY('+dy+'px)'}},
+   en=()=>{if(y0===null)return;tf.classList.remove('drag');tf.style.transform='';if(dy>90)open(false);y0=null};
+  tf.addEventListener('touchstart',st,{passive:true});tf.addEventListener('touchmove',mv,{passive:true});tf.addEventListener('touchend',en);}
  el._tick=()=>{const c=A.currentTime||0;
   wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.9)})});
   prog.style.width=Math.min(100,c/r.dur*100)+'%';tm.textContent=fmt(c);
-  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){el._tk=k;tfh.textContent='تفسير الآية '+AR(r.ay[k].n);tfp.textContent=r.ay[k].tf||'';tf.scrollTop=0}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
+  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){const first=el._tk===undefined;el._tk=k;const set=()=>{tfh.innerHTML='تفسير الآية '+AR(r.ay[k].n);tfp.textContent=r.ay[k].tf||'';tf.querySelector('.tb').scrollTop=0;tfp.classList.remove('sw')};if(first)set();else{tfp.classList.add('sw');setTimeout(set,260)}}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
   if(v&&!A.paused&&Math.abs(v.currentTime-c)>.3)v.currentTime=c};
  el.querySelector('.prog').addEventListener('click',e=>{const b=e.currentTarget.getBoundingClientRect();A.currentTime=Math.max(0,(b.right-e.clientX)/b.width*r.dur);if(v)v.currentTime=A.currentTime});
- let last=0;el.addEventListener('click',e=>{if(e.target.closest('button,.prog,.tf'))return;const now=Date.now();
+ let last=0;el.addEventListener('click',e=>{if(e.target.closest('button,.prog,.tfs'))return;if(el.classList.contains('tfo')){el._tfx();return}const now=Date.now();
   if(now-last<320){const h=document.createElement('div');h.className='burst';h.style.left=e.clientX+'px';h.style.top=e.clientY+'px';h.innerHTML='<svg><use href="#hr"/></svg>';el.appendChild(h);setTimeout(()=>h.remove(),900);like(el,i,true)}
   else setTimeout(()=>{if(Date.now()-last>=300)toggle()},320);last=now});
  const lk=el.querySelector('.lk');lk.classList.toggle('on',!!LK[r.k]);lk.addEventListener('click',()=>like(el,i));
