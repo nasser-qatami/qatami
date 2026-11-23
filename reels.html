@@ -2,7 +2,7 @@
 var dark=p==="dark"||(p!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);if(!dark)d.classList.add("day");
 addEventListener("DOMContentLoaded",function(){var m=document.querySelector("meta[name=theme-color]");if(m)m.content=dark?"#0E0B07":"#F5EDDB"})})()</script><title>نفحات · نبأ عظيم</title><meta name="theme-color" content="#F5EDDB">
 <style>
-@font-face{font-family:Hafs;src:url(fonts/hafs.otf)}@font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/ruqaa700.woff2)}
+@font-face{font-family:Hafs;src:url(fonts/hafs.otf)}@font-face{font-family:Naskh;font-weight:400;src:url(fonts/naskh400.woff2)}@font-face{font-family:Naskh;font-weight:700;src:url(fonts/naskh700.woff2)}@font-face{font-family:Ruqaa;font-weight:700;src:url(fonts/ruqaa700.woff2)}
 @font-face{font-family:Cairo;font-weight:400;src:url(fonts/cairo400.woff2)}@font-face{font-family:Cairo;font-weight:600;src:url(fonts/cairo600.woff2)}
 :root{--gold:#E3C36A;--gold2:#A07A2C;--ink:#F3E9D2;--mute:#A9987A}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -162,24 +162,32 @@ html.day .reel::after{opacity:.05}
  background:linear-gradient(180deg,#221a0d,#0e0a05 70%);
  border-top:1px solid rgba(245,220,150,.45);box-shadow:0 -30px 60px -20px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.1);
  transform:translate3d(0,105%,0);visibility:hidden;transition:transform .3s cubic-bezier(.4,0,.7,.2),visibility 0s .3s;touch-action:none;will-change:transform;contain:layout paint}
-.tfs .th,.tfs .tb,.tfs .src{opacity:0;transform:translate3d(0,10px,0);transition:opacity .18s,transform .18s}
-.reel.tfo .tfs .th,.reel.tfo .tfs .tb,.reel.tfo .tfs .src{opacity:1;transform:none;transition:opacity .32s .1s,transform .4s .1s cubic-bezier(.32,.72,0,1)}
+.tfs .th,.tfs .orn,.tfs .tb,.tfs .src{opacity:0;transform:translate3d(0,10px,0);transition:opacity .18s,transform .18s}
+.reel.tfo .tfs .th,.reel.tfo .tfs .orn,.reel.tfo .tfs .tb,.reel.tfo .tfs .src{opacity:1;transform:none;transition:opacity .32s .1s,transform .4s .1s cubic-bezier(.32,.72,0,1)}
 .reel.tfo .tfs{transform:none;visibility:visible;transition:transform .42s cubic-bezier(.32,.72,0,1),visibility 0s}
 .tfs.drag{transition:none!important}
-.tfs .gr{width:42px;height:4.5px;border-radius:9px;background:rgba(245,220,150,.4);margin:2px auto 12px;flex:none}
-.tfs .th{display:flex;align-items:center;justify-content:space-between;flex:none;padding-bottom:10px;border-bottom:1px solid rgba(245,220,150,.16)}
-.tfs h4{margin:0;font:700 15px Cairo;color:var(--gold)}.tfs h4 small{font:400 11.5px Cairo;color:rgba(234,223,191,.55);margin-inline-start:8px}
-.tfs .x{width:30px;height:30px;border-radius:50%;border:1px solid rgba(245,220,150,.3);background:rgba(255,255,255,.05);color:var(--gold);display:grid;place-items:center}
-.tfs .x svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
-.tfs .tb{flex:1;overflow:auto;overscroll-behavior:contain;padding:14px 2px 6px;touch-action:pan-y;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 18px),transparent);mask-image:linear-gradient(180deg,transparent 0,#000 12px,#000 calc(100% - 18px),transparent)}
-.tfs p{margin:0;font:400 16px/2.1 Cairo;color:#F1E7C8;transition:opacity .35s,transform .35s;text-wrap:pretty}.tfs p.sw{opacity:0;transform:translateY(6px)}
-.tfs .src{flex:none;padding-top:8px;font:400 11px Cairo;color:rgba(234,223,191,.45);text-align:center}
+.tfs{background-image:radial-gradient(120% 60% at 50% 0,rgba(227,195,106,.13),transparent 60%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23E3C36A' stroke-width='.6' opacity='.07'%3E%3Crect x='14' y='14' width='28' height='28'/%3E%3Crect x='14' y='14' width='28' height='28' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(180deg,#221a0d,#0e0a05 70%)!important}
+.tfs:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(245,220,150,.08),inset 0 1px 0 rgba(245,220,150,.35)}
+.tfs .gr{width:40px;height:4px;border-radius:9px;background:linear-gradient(90deg,transparent,rgba(245,220,150,.55),transparent);margin:2px auto 10px;flex:none}
+.tfs .th{display:flex;align-items:center;justify-content:space-between;flex:none;gap:12px}
+.tfs .tt{display:flex;flex-direction:column;gap:2px}
+.tfs .lb{font:700 25px/1.25 Ruqaa,serif;background:linear-gradient(180deg,#F7E3A6,#C9A24B);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 8px rgba(227,195,106,.25))}
+.tfs h4{margin:0;display:flex;align-items:center;gap:6px;font:400 12.5px Cairo;color:rgba(234,223,191,.62)}
+.tfs .md{font:400 19px/1 Hafs,serif;color:var(--gold);transform:translateY(1px)}
+.tfs .x{width:34px;height:34px;flex:none;border-radius:50%;border:1px solid rgba(245,220,150,.28);background:radial-gradient(circle at 50% 30%,rgba(245,220,150,.12),rgba(255,255,255,.02));color:var(--gold);display:grid;place-items:center}
+.tfs .x svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.tfs .orn{display:flex;align-items:center;gap:10px;margin:12px 0 0;flex:none;color:var(--gold)}
+.tfs .orn i{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(227,195,106,.45))}.tfs .orn i:last-child{background:linear-gradient(270deg,transparent,rgba(227,195,106,.45))}
+.tfs .orn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.1;opacity:.85}
+.tfs .tb{flex:1;overflow:auto;overscroll-behavior:contain;padding:16px 4px 8px;touch-action:pan-y;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(180deg,transparent 0,#000 14px,#000 calc(100% - 22px),transparent)}
+.tfs p{margin:0;font:400 18.5px/2.15 Naskh,serif;color:#F3EAD0;text-align:start;transition:opacity .35s,transform .35s;text-wrap:pretty}.tfs p.sw{opacity:0;transform:translateY(6px)}
+.tfs .src{flex:none;padding-top:8px;font:400 10.5px Cairo;letter-spacing:.2px;color:rgba(234,223,191,.4);text-align:center}
 .reel .ayat{transition:transform .32s cubic-bezier(.4,0,.2,1);transform-origin:50% 50%;will-change:transform}
 .reel.tfo .ayat{transform:translate3d(0,var(--ty,0),0) scale(var(--sc,.74));transition:transform .42s cubic-bezier(.32,.72,0,1)}
 .reel.act.tfo .glass{transform:translate3d(0,14px,0);opacity:0;pointer-events:none;transition:transform .2s,opacity .16s}
 .reel .glass{transition:transform .38s .08s cubic-bezier(.32,.72,0,1),opacity .3s .08s}
 .reel.vd .tfs{height:46%}.reel.vd .tfb{top:-13px;padding:4px 13px 4px 11px;font-size:11.5px}.reel.vd.tfo .top,.reel.vd.tfo .frm{opacity:.0;transition:opacity .4s}
-html.day .tfs{background:linear-gradient(180deg,#FCF7E8,#F2EAD2 70%);border-top-color:rgba(143,106,34,.5)}html.day .tfs h4{color:#8F6A22}html.day .tfs p{color:#3A2A12}html.day .tfs .src,html.day .tfs h4 small{color:#7A6338}html.day .tfs .x{color:#8F6A22;border-color:rgba(143,106,34,.35)}html.day .tfs .gr{background:rgba(143,106,34,.35)}html.day .tfs .th{border-color:rgba(143,106,34,.2)}
+html.day .tfs{background-image:radial-gradient(120% 60% at 50% 0,rgba(201,162,75,.16),transparent 60%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%238F6A22' stroke-width='.6' opacity='.08'%3E%3Crect x='14' y='14' width='28' height='28'/%3E%3Crect x='14' y='14' width='28' height='28' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(180deg,#FCF7E8,#F2EAD2 70%)!important;border-top-color:rgba(143,106,34,.5)}html.day .tfs .lb{background:linear-gradient(180deg,#A67C2A,#6E4F17);-webkit-background-clip:text;background-clip:text;filter:none}html.day .tfs h4{color:#7A6338}html.day .tfs .md,html.day .tfs .orn{color:#8F6A22}html.day .tfs p{color:#2E2210}html.day .tfs .src{color:#7A6338}html.day .tfs .x{color:#8F6A22;border-color:rgba(143,106,34,.35);background:rgba(143,106,34,.06)}html.day .tfs .gr{background:linear-gradient(90deg,transparent,rgba(143,106,34,.45),transparent)}html.day .tfs .orn i{background:linear-gradient(90deg,transparent,rgba(143,106,34,.45))}html.day .tfs .orn i:last-child{background:linear-gradient(270deg,transparent,rgba(143,106,34,.45))}html.day .tfs:before{box-shadow:inset 0 1px 0 rgba(143,106,34,.3)}
 html.day .tfb{background:linear-gradient(180deg,#FBF4DC,#EADBB0);color:#8F6A22;border-color:rgba(143,106,34,.5)}
 </style>
 <body><svg width="0" height="0" style="position:absolute"><defs>
@@ -213,7 +221,7 @@ document.getElementById("feed").innerHTML=D.map((r,i)=>{
 const UP='<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>',XX='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 document.querySelectorAll('.reel').forEach((el,i)=>{const r=D[i];if(!r.ay.some(a=>a.tf))return;
  el.querySelector('.glass').insertAdjacentHTML('afterbegin','<button class="tfb" aria-label="التفسير">'+UP+'تفسير</button>');
- el.insertAdjacentHTML('beforeend','<div class="tfs" role="dialog" aria-label="التفسير الميسر"><div class="gr"></div><div class="th"><h4></h4><button class="x" aria-label="إغلاق">'+XX+'</button></div><div class="tb"><p></p></div><div class="src">التفسير الميسر · مجمع الملك فهد لطباعة المصحف الشريف</div></div>')});
+ el.insertAdjacentHTML('beforeend','<div class="tfs" role="dialog" aria-label="التفسير الميسر"><div class="gr"></div><div class="th"><div class="tt"><span class="lb">التفسير الميسَّر</span><h4></h4></div><button class="x" aria-label="إغلاق">'+XX+'</button></div><div class="orn"><i></i><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/><rect x="6" y="6" width="12" height="12" transform="rotate(45 12 12)"/><circle cx="12" cy="12" r="2.2"/></svg><i></i></div><div class="tb"><p></p></div><div class="src">مجمع الملك فهد لطباعة المصحف الشريف</div></div>')});
 
 
 function fit(){document.querySelectorAll('.reel').forEach(r=>{const box=r.querySelector('.ayat');if(!box)return;const H=box.clientHeight;r.querySelectorAll('.ay').forEach(a=>{let f=34;a.style.fontSize=f+'px';while(a.scrollHeight>H&&f>15){f--;a.style.fontSize=f+'px'}})})}
@@ -239,7 +247,7 @@ secs.forEach((el,i)=>{const r=D[i];
  el._tick=()=>{const c=A.currentTime||0;
   wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.9)})});
   prog.style.width=Math.min(100,c/r.dur*100)+'%';tm.textContent=fmt(c);
-  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){const first=el._tk===undefined;el._tk=k;const set=()=>{tfh.innerHTML='تفسير الآية '+AR(r.ay[k].n);tfp.textContent=r.ay[k].tf||'';tf.querySelector('.tb').scrollTop=0;tfp.classList.remove('sw')};if(first)set();else{tfp.classList.add('sw');setTimeout(set,260)}}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
+  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){const first=el._tk===undefined;el._tk=k;const set=()=>{tfh.innerHTML='سورة '+r.surah+'<span class="md">﴿'+AR(r.ay[k].n)+'﴾</span>';tfp.textContent=r.ay[k].tf||'';tf.querySelector('.tb').scrollTop=0;tfp.classList.remove('sw')};if(first)set();else{tfp.classList.add('sw');setTimeout(set,260)}}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
   if(v&&!A.paused&&Math.abs(v.currentTime-c)>.3)v.currentTime=c};
  el.querySelector('.prog').addEventListener('click',e=>{const b=e.currentTarget.getBoundingClientRect();A.currentTime=Math.max(0,(b.right-e.clientX)/b.width*r.dur);if(v)v.currentTime=A.currentTime});
  let last=0;el.addEventListener('click',e=>{if(e.target.closest('button,.prog,.tfs'))return;if(el.classList.contains('tfo')){el._tfx();return}const now=Date.now();
