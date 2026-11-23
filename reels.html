@@ -153,6 +153,12 @@ html.day .reel::after{opacity:.05}
 /* launch: the button blooms, the panel lifts away, the picture dims */
 .reel.launch .full{background:linear-gradient(135deg,#8F6A22,#E3C36A 50%,#B8913A);color:#2A1D08;border-color:#FFE9A8;box-shadow:0 0 0 0 rgba(245,220,150,.6);animation:lbl .5s ease-out}
 @keyframes lbl{0%{box-shadow:0 0 0 0 rgba(245,220,150,.7)}100%{box-shadow:0 0 0 22px rgba(245,220,150,0)}}
+.tf{display:none;margin-bottom:12px;padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.35);border:1px solid rgba(227,195,106,.22);max-height:190px;overflow:auto;text-align:right}
+.tf h4{margin:0 0 4px;font:600 11.5px Cairo;color:var(--gold)}.tf p{margin:0;font:400 13.5px/1.85 Cairo;color:#EADFBF}.tf small{display:block;margin-top:6px;font:400 10.5px Cairo;color:rgba(234,223,191,.5)}
+.tfb{padding:3px 14px;border-radius:99px;border:1px solid rgba(227,195,106,.4);background:rgba(227,195,106,.08);color:var(--gold);font:600 12px Cairo}
+.reel.tfo .tf{display:block}.reel.tfo .ayat{bottom:480px}
+.reel.au .tm{align-items:center}
+html.day .tf{background:rgba(255,250,235,.75);border-color:rgba(143,106,34,.3)}html.day .tf h4{color:#8F6A22}html.day .tf p{color:#3A2A12}html.day .tf small{color:#7A6338}html.day .tfb{color:#8F6A22;border-color:rgba(143,106,34,.4);background:rgba(143,106,34,.08)}
 </style>
 <body><svg width="0" height="0" style="position:absolute"><defs>
 <pattern id="lat" width="64" height="64" patternUnits="userSpaceOnUse"><g fill="none" stroke="#E3C36A" stroke-width=".7" opacity=".16"><rect x="16" y="16" width="32" height="32"/><rect x="16" y="16" width="32" height="32" transform="rotate(45 32 32)"/></g></pattern>
@@ -180,7 +186,7 @@ document.getElementById("feed").innerHTML=D.map((r,i)=>{
  const full=`<div class="row">${ib('hr','lk','أعجبني')}${ib('mk','mk','علامة')}${ib('sh','sh','مشاركة')}<button class="full">اسمع الليلة كاملة</button></div>`;
  const dots=r.ay.length>1?`<div class="dots">${r.ay.map(()=>'<b></b>').join('')}</div>`:'';
  if(r.video) return `<section class="reel vd" data-i="${i}"><video src="${r.file}" playsinline muted preload="metadata"></video><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="glass"><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span><span>${fmt(r.dur)}</span></div>${full}</div></section>`;
- return `<section class="reel au" data-i="${i}"><svg class="lat" width="100%" height="100%"><rect width="100%" height="100%" fill="url(#lat)"/></svg><svg class="star"><use href="#st"/></svg><div class="glow"></div><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="ayat">${ay}</div>${dots}<div class="glass"><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span><span>${fmt(r.dur)}</span></div>${full}</div></section>`;
+ return `<section class="reel au" data-i="${i}"><svg class="lat" width="100%" height="100%"><rect width="100%" height="100%" fill="url(#lat)"/></svg><svg class="star"><use href="#st"/></svg><div class="glow"></div><div class="frm" aria-hidden="true"><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg><svg viewBox="0 0 40 40"><use href="#cn"/></svg></div><div class="top"><span class="pill">نَبَأٌ عَظِيم</span><span class="nm">${i+1} / ${D.length}</span></div><div class="ayat">${ay}</div>${dots}<div class="glass"><div class="tf"><h4></h4><p></p><small>التفسير الميسر</small></div><div class="gt"><div class="sn">سورة ${r.surah}<small>الآيات ${r.range}</small></div><div class="who"><b>الشيخ ناصر القطامي</b><span>${r.src}</span></div></div><div class="prog rtl"><i></i></div><div class="tm"><span data-time>${fmt(0)}</span>${r.ay.some(a=>a.tf)?'<button class="tfb">تفسير</button>':''}<span>${fmt(r.dur)}</span></div>${full}</div></section>`;
 }).join("");
 
 function fit(){document.querySelectorAll('.reel').forEach(r=>{const box=r.querySelector('.ayat');if(!box)return;const H=box.clientHeight;r.querySelectorAll('.ay').forEach(a=>{let f=34;a.style.fontSize=f+'px';while(a.scrollHeight>H&&f>15){f--;a.style.fontSize=f+'px'}})})}
@@ -195,14 +201,14 @@ const secs=[...document.querySelectorAll('.reel')];
 secs.forEach((el,i)=>{const r=D[i];
  el.insertAdjacentHTML('beforeend','<div class="pz"><svg><use href="#pl"/></svg></div>');
  const v=el.querySelector('video'),prog=el.querySelector('.prog i'),tm=el.querySelector('[data-time]'),ays=[...el.querySelectorAll('.ay')],dots=[...el.querySelectorAll('.dots b')],wsp=ays.map(a=>[...a.querySelectorAll('.l')].map(l=>[l,+l.dataset.t]));
- el._v=v;
+ el._v=v;const tf=el.querySelector('.tf'),tfh=tf&&tf.querySelector('h4'),tfp=tf&&tf.querySelector('p'),tfb=el.querySelector('.tfb');if(tfb)tfb.addEventListener('click',()=>{el.classList.toggle('tfo');fit();S('rl/tf/'+r.k,r.surah)});
  el._tick=()=>{const c=A.currentTime||0;
   wsp.forEach(L=>{let cu=-1;for(let x=0;x<L.length;x++){if(L[x][1]<=c)cu=x;else break}L.forEach((p,x)=>{p[0].classList.toggle('dn',x<=cu);p[0].classList.toggle('cu',x===cu&&c-p[1]<.9)})});
   prog.style.width=Math.min(100,c/r.dur*100)+'%';tm.textContent=fmt(c);
-  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
+  let k=0;r.ay.forEach((a,j)=>{if(c>=a.t-.15)k=j});if(tf&&el._tk!==k){el._tk=k;tfh.textContent='تفسير الآية '+AR(r.ay[k].n);tfp.textContent=r.ay[k].tf||'';tf.scrollTop=0}ays.forEach((a,j)=>a.classList.toggle('on',j===k));dots.forEach((d,j)=>d.classList.toggle('on',j===k));
   if(v&&!A.paused&&Math.abs(v.currentTime-c)>.3)v.currentTime=c};
  el.querySelector('.prog').addEventListener('click',e=>{const b=e.currentTarget.getBoundingClientRect();A.currentTime=Math.max(0,(b.right-e.clientX)/b.width*r.dur);if(v)v.currentTime=A.currentTime});
- let last=0;el.addEventListener('click',e=>{if(e.target.closest('button,.prog'))return;const now=Date.now();
+ let last=0;el.addEventListener('click',e=>{if(e.target.closest('button,.prog,.tf'))return;const now=Date.now();
   if(now-last<320){const h=document.createElement('div');h.className='burst';h.style.left=e.clientX+'px';h.style.top=e.clientY+'px';h.innerHTML='<svg><use href="#hr"/></svg>';el.appendChild(h);setTimeout(()=>h.remove(),900);like(el,i,true)}
   else setTimeout(()=>{if(Date.now()-last>=300)toggle()},320);last=now});
  const lk=el.querySelector('.lk');lk.classList.toggle('on',!!LK[r.k]);lk.addEventListener('click',()=>like(el,i));
