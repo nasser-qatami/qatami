@@ -179,7 +179,7 @@ def guess_surahs(track, t, W):
     return c
 
 def chain(ms, t):
-    """Pick consecutive ayat around moment t: start at the ayah that holds t (or starts just after), 35–95 s long.
+    """Pick consecutive ayat around moment t: start at the ayah that holds t (or starts just after), 90–130 s long (never under 1:30).
     A single ayah the transcript missed in the middle is allowed (it gets a placeholder; refine.py times its words later);
     the first and last ayah must have been heard."""
     first = {}
@@ -194,16 +194,16 @@ def chain(ms, t):
             v = cur[-1]["v"]; nx = first.get(v + 1)
             if nx is None:
                 n2 = first.get(v + 2)
-                if n2 and 3 <= n2["s"] - cur[-1]["e"] <= 24 and n2["e"] - cur[0]["s"] <= 95:
+                if n2 and 3 <= n2["s"] - cur[-1]["e"] <= 24 and n2["e"] - cur[0]["s"] <= 130:
                     cur.append(dict(v=v + 1, r=0, s=cur[-1]["e"] + 0.3, e=n2["s"] - 0.3, ph=True)); nx = n2
                 else: break
             if nx["s"] < cur[-1]["e"] - 1 or nx["s"] - cur[-1]["e"] > 24: break
-            if nx["e"] - cur[0]["s"] > 95: break
+            if nx["e"] - cur[0]["s"] > 130: break
             cur.append(nx)
-            if cur[-1]["e"] - cur[0]["s"] >= 55: break
+            if cur[-1]["e"] - cur[0]["s"] >= 92: break
         while cur and cur[-1].get("ph"): cur.pop()
         dur = cur[-1]["e"] - cur[0]["s"]
-        if 35 <= dur <= 95 and cur[0]["s"] <= t + 4: return cur
+        if 90 <= dur <= 130 and cur[0]["s"] <= t + 4: return cur
     return None
 
 # ---------- labels ----------
@@ -228,7 +228,7 @@ def build(key, t):
     if key not in BY: return None, "unknown key"
     c, tr = BY[key]; src = tr.get("url")
     if not src or "youtube" in src: return None, "no audio url"
-    a = max(0, t - 75); W = words(pcm(src, a, 190), a)
+    a = max(0, t - 60); W = words(pcm(src, a, 290), a)
     if len(W) < 20: return None, "no speech"
     for sur in guess_surahs(tr, t, W):
         ms = match(W, sur)
