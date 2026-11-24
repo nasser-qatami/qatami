@@ -63,6 +63,14 @@ def align(Qw, Ww):
             else: st[i] = st[lo] + (st[hi] - st[lo]) * (i - lo) / (hi - lo)
     return st, mt
 
+def quiet(path, a, b):
+    """True if the clip is (near) silent between a and b seconds (every 50 ms frame under -35 dB)."""
+    if b - a < 0.1: return True
+    x = pcm(path, a, b - a); n = int(0.05 * SR); m = len(x) // n
+    if m < 1: return True
+    d = 20 * np.log10(np.sqrt((x[:m * n].reshape(m, n) ** 2).mean(1)) + 1e-9)
+    return bool((d < -35).all())
+
 def recut(path, a, dur, video=None):
     tmp = path + ".tmp.mp3"
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{a:.2f}", "-i", path, "-t", f"{dur:.2f}", "-af",
@@ -94,8 +102,10 @@ for r in R:
         lead = W[0][1]; tail = r["dur"] - W[-1][2]      # first SPOKEN word, never an interpolated one
         # trim head / tail silence (only when clearly long)
         a0, d1 = 0.0, r["dur"]
-        if lead > 1.2 and first_ok: a0 = lead - 0.5
-        if tail > 1.8 and last_ok: d1 = W[-1][2] + 0.9
+        # only cut away what is really silence: whisper misses separate letters (صٓ، الٓمٓ ...) and its word ends are often early
+        # on stretched syllables, so trimming by its times alone cut real recitation (the start of Sad, ends of ayat).
+        if lead > 1.2 and first_ok and quiet(path, 0, lead - 0.5): a0 = lead - 0.5
+        if tail > 1.8 and last_ok and quiet(path, W[-1][2] + 0.9, r["dur"]): d1 = W[-1][2] + 0.9
         if (a0 > 0 or d1 < r["dur"] - 0.05) and rnd == 0:
             recut(path, a0, d1 - a0, vid); r["off"] = round(r["off"] + a0, 2); r["dur"] = round(d1 - a0, 2); notes.append(f"trimmed head {a0:.1f}s tail {r['dur'] + a0 - d1 + (d1 - a0 - r['dur']):.1f}")
             continue
