@@ -96,8 +96,10 @@ body{font-family:Cairo,sans-serif;color:var(--ink)}
 
 .ay{color:rgba(255,243,207,.34);text-shadow:none}
 .ay .l{transition:color .18s,text-shadow .25s}
-.ay .l.dn{color:#FFF3CF;text-shadow:0 0 20px rgba(227,195,106,.2)}
-.ay .l.cu{color:#F7DE9A;text-shadow:0 0 14px rgba(245,220,150,.9),0 0 30px rgba(245,220,150,.45)}
+.ay .l.dn{color:#FFF3CF}
+.ay .l.cu{color:#FFE9A8}
+.ay .l.wq{padding:.5em .45em;margin:-.5em -.45em}
+.ay.on{filter:drop-shadow(0 0 9px rgba(245,220,150,.22))}
 .reel.au .glass .gt{margin-bottom:16px}
 .reel .prog i{transition:none}
 
@@ -144,7 +146,8 @@ html.day .ib.on{color:#8F6A22}.ib.on svg{fill:#8F6A22}
 html.day .ay{color:rgba(58,42,18,.3);text-shadow:none}
 html.day .ay i{color:#8F6A22}
 html.day .ay .l.dn{color:#3A2A12;text-shadow:none}
-html.day .ay .l.cu{color:#8F6A22;text-shadow:0 0 12px rgba(201,162,75,.7)}
+html.day .ay .l.cu{color:#8F6A22}
+html.day .ay.on{filter:none}
 html.day .dots b{background:rgba(143,106,34,.25)}.dots b.on{background:#8F6A22}
 html.day .reel.vd::before{background:linear-gradient(180deg,rgba(245,237,219,.45),transparent 22%,transparent 55%,rgba(245,237,219,.55) 92%)}
 html.day .pz{background:rgba(255,253,246,.7);border-color:rgba(143,106,34,.4)}.pz svg{fill:#8F6A22}
@@ -207,7 +210,7 @@ for(let i=D.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[D[i],D[j]
 const CL=/[\u0621-\u064A\u0671-\u06D3\u06FA-\u06FF][\u064B-\u065F\u0670\u06D6-\u06ED\u0640]*/g;
 function wordsHtml(a){const W=a.text.split(" ");return W.map((w,x)=>{const ls=w.match(CL)||[w],ts=a.w[x],nx=a.w[x+1],cap=Math.max(.5,.42*ls.length),te=Math.min(nx!==undefined?nx:ts+cap,ts+cap);
   const wt=ls.map((l,i)=>(/^[\u0627\u0622\u0648\u064A\u0649]/.test(l)&&!/[\u064E\u064F\u0650\u0651\u0652\u0653]/.test(l.slice(1))?1.7:1)*(i===ls.length-1?1.4:1)),sum=wt.reduce((p,q)=>p+q,0);let acc=0;
-  return ls.map((l,i)=>{const t=ts+(te-ts)*acc/sum;acc+=wt[i];return`<span class="l" data-t="${t.toFixed(2)}">${l}</span>`}).join("")}).join(" ")}
+  return ls.map((l,i)=>{const t=ts+(te-ts)*acc/sum;acc+=wt[i];return`<span class="l${/[\u06D6-\u06DC\u06DF-\u06E4]/.test(l)?" wq":""}" data-t="${t.toFixed(2)}">${l}</span>`}).join("")}).join(" ")}
 const bars=Array.from({length:34},(_,i)=>`<b style="--h:${8+Math.round(Math.abs(Math.sin(i*1.7)*Math.cos(i*.6))*26)}px;animation-delay:${(i%9)*-.13}s"></b>`).join("");
 const ib=(i,c,l)=>`<button class="ib ${c}" aria-label="${l}"><svg><use href="#${i}"/></svg></button>`;
 const AR=n=>String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
