@@ -21,7 +21,7 @@ for r in D:
         except Exception: b = ""
         try: q = json.loads(curl(f"https://api.quran.com/api/v4/tafsirs/16/by_ayah/{s}:{a['n']}"))["tafsir"]["text"]
         except Exception: q = ""
-        t = n2(a["tf"].replace("صلى الله عليه وسلم", "")); ok_b = t in n2(b.replace("ﷺ", "")); ok_q = t in n2(q.replace("ﷺ", ""))
+        t = n2(a["tf"].replace("صلى الله عليه وسلم", "")); ok_b = t in n2(b.replace("ﷺ", "").replace("صلى الله عليه وسلم", "")); ok_q = t in n2(q.replace("ﷺ", "").replace("صلى الله عليه وسلم", ""))
         if not (ok_b or ok_q): bad += 1; print("NOT FOUND:", r["k"], r["surah"], a["n"])
         elif not (ok_b and ok_q): print("note: differs in one source:", r["k"], r["surah"], a["n"], "spa5k" if ok_b else "quran.com")
 print("checked; unmatched:", bad); sys.exit(1 if bad else 0)

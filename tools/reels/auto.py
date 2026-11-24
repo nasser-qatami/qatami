@@ -103,7 +103,7 @@ def model():
 
 def words(aud, off=0.0):
     segs, _ = model().transcribe(aud, language="ar", word_timestamps=True, vad_filter=False, beam_size=3, condition_on_previous_text=False)
-    return [(w.word.strip(), round(w.start + off, 2), round(w.end + off, 2)) for s in segs for w in s.words if w.word.strip()]
+    return [(w.word.strip(), round(w.start + off, 2), round(w.end + off, 2)) for s in segs for w in s.words if norm(w.word)]  # skip stray tokens like '2.' that whisper sometimes emits (they broke the first-word check)
 
 def env_db(src, a, b):
     x = pcm(src, a, b - a); n = int(0.02 * SR); m = len(x) // n
