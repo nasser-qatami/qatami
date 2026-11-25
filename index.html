@@ -3230,7 +3230,14 @@ function mediaSession(r) {
     doc.then(() => coverArt(r)).then(src => { if (!src || player.cur !== r) return;
       try { navigator.mediaSession.metadata = new MediaMetadata({ title: r.title, artist: "ناصر القطامي", album: r.c.title, artwork: [{ src, sizes: "512x512", type: "image/jpeg" }, { src: ico + "icon-512.png", sizes: "512x512", type: "image/png" }] }); } catch {} });
     const ms = navigator.mediaSession;
-    ms.setActionHandler("play", () => { if (player.cur && !audio.getAttribute("src") && !ytCur) load(player.cur); else audio.play().catch(() => {}); });
+    ms.setActionHandler("play", () => {   /* from the lock screen / control center: if the phone dropped the stream while paused, load it again from where it stopped */
+    const r = player.cur; if (!r || ytCur) { audio.play().catch(() => {}); return; }
+    if (!audio.getAttribute("src")) { load(r); return; }
+    let again = false; const redo = () => { if (again) return; again = true; try { savePos(); } catch {} load(r, { resume: true }); };
+    let gone = false; audio.addEventListener("pause", () => { gone = true; }, { once: true });
+    const p = audio.play(); if (p && p.catch) p.catch(redo);
+    setTimeout(() => { if (!gone && audio.paused && !audio.ended) redo(); }, 1500);
+  });
     ms.setActionHandler("seekto", d => { if (d && isFinite(d.seekTime)) audio.currentTime = d.seekTime; });
     ms.setActionHandler("pause", () => audio.pause());
     ms.setActionHandler("nexttrack", () => step(1));
