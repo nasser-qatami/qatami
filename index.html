@@ -2621,7 +2621,8 @@ function reelsSync(k) {
   document.body.appendChild(box);
 }
 /* warm up the clips page while the home page is idle, so the tab opens at once */
-setTimeout(() => { try { fetch("reels.json", { cache: "no-cache" }).catch(() => {}); ["hafs.otf", "ruqaa700.woff2", "cairo400.woff2", "cairo600.woff2"].forEach(f => fetch("fonts/" + f).catch(() => {})); reelWarm(); } catch {} }, 2500);
+{ const go = () => { try { reelWarm(); } catch {} }; /* starts as soon as the home page is up, so even a quick tap on «نفحات» finds it ready */
+  if (document.readyState === "complete") setTimeout(go, 150); else window.addEventListener("load", () => setTimeout(go, 150), { once: true }); }
 let reelAudio = null, reelUnlocked = false;
 /* iPhone only lets sound start from a tap. The tap on «نفحات» happens here, not inside the clips page,
    so the shared player for the clips is created and unlocked here, during that tap, and handed to the page. */

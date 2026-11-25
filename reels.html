@@ -204,7 +204,9 @@ html.day .tfb{background:linear-gradient(180deg,#FBF4DC,#EADBB0);color:#8F6A22;b
 </defs></svg>
 <svg width="0" height="0" style="position:absolute"><symbol id="pl" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol></svg><main id="feed"></main>
 <script>
-fetch("reels.json",{cache:"no-cache"}).then(r=>r.json()).then(D=>{
+/* fresh list when the network answers quickly, otherwise the saved copy, so a slow connection never holds the page */
+const RJ=new Promise((ok,no)=>{const t=setTimeout(()=>caches.open("qtm-reels-json").then(c=>c.match("reels.json")).then(h=>h?ok(h):f.then(ok,no)),1200),f=fetch("reels.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw 0;clearTimeout(t);try{const cp=r.clone();caches.open("qtm-reels-json").then(c=>c.put("reels.json",cp))}catch{}return r});f.then(ok,()=>{clearTimeout(t);caches.open("qtm-reels-json").then(c=>c.match("reels.json")).then(h=>h?ok(h):no())})});
+RJ.then(r=>r.json()).then(D=>{
 for(let i=D.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[D[i],D[j]]=[D[j],D[i]]} // ترتيب عشوائي كل مرة
 const CL=/[\u0621-\u064A\u0671-\u06D3\u06FA-\u06FF][\u064B-\u065F\u0670\u06D6-\u06ED\u0640]*/g;
 function wordsHtml(a){const W=a.text.split(" ");return W.map((w,x)=>{const ls=w.match(CL)||[w],ts=a.w[x],nx=a.w[x+1],cap=Math.max(.5,.42*ls.length),te=Math.min(nx!==undefined?nx:ts+cap,ts+cap);
@@ -282,6 +284,7 @@ function go(i){if(i===cur)return;secs.forEach((x,j)=>{if(j!==i){x.classList.remo
  A.src=r.aud;A.currentTime=0;if(el._v){el._v.currentTime=0}el._tick();play();S('rl/v/'+r.k,'سورة '+r.surah);history.replaceState(null,'','#'+r.k);try{H&&H.at&&H.at(r.k)}catch{}}
 let pend=0,want=-1;const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.6){want=secs.indexOf(e.target);clearTimeout(pend);if(cur<0)go(want);else pend=setTimeout(()=>go(want),160)}}),{threshold:[.6]});
 let started=false;
+if(location.hash==='#warm'&&D[0]){try{D[0].aud&&fetch(D[0].aud,{cache:'force-cache'}).catch(()=>{})}catch{}}
 function start(k){if(started)return;started=true;const i=D.findIndex(r=>r.k===k);if(i>0)secs[i].scrollIntoView();setTimeout(()=>secs.forEach(x=>io.observe(x)),60)}
 if(location.hash!=='#warm')start(location.hash.slice(1));
 addEventListener('message',e=>{if(e.data&&e.data.t==='show')start(e.data.k&&e.data.k.replace(/^#/,''))});
