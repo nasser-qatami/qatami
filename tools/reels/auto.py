@@ -255,7 +255,7 @@ def guess_surahs(track, t, W):
         if s not in c: c.append(s)
     return [x for x in c if x != 1]          # the owner does not want Al-Fatiha clips
 
-def chain(ms, t):
+def chain(ms, t, sur=None):
     """Pick consecutive ayat around moment t: start at the ayah that holds t (or starts just after), 90–130 s long (never under 1:30).
     Each next ayah is the occurrence that follows the previous one in time (the transcript can match an ayah in several places:
     a repeated phrase, or a weak match far away), not simply the earliest one.
@@ -280,8 +280,16 @@ def chain(ms, t):
             cur.append(nx)
             if cur[-1]["e"] - cur[0]["s"] >= 92: break
         while cur and cur[-1].get("ph"): cur.pop()
+        # owner's rule: if less than 40 s of the surah remain after the clip, carry on to the END of the surah (up to 170 s)
+        if sur and cur and cur[-1]["e"] - cur[0]["s"] >= 90:
+            N = len(Q[sur - 1]["verses"]); ext = list(cur)
+            while ext[-1]["v"] < N:
+                nx = after(ext[-1]["v"] + 1, ext[-1]["e"])
+                if nx is None or nx["e"] - ext[0]["s"] > 170: break
+                ext.append(nx)
+            if ext[-1]["v"] == N and ext[-1]["e"] - cur[-1]["e"] < 40: cur = ext
         dur = cur[-1]["e"] - cur[0]["s"]
-        if 90 <= dur <= 130 and cur[0]["s"] <= t + 4: return cur
+        if 90 <= dur <= 170 and cur[0]["s"] <= t + 4: return cur
     return None
 
 # ---------- labels ----------
@@ -314,7 +322,7 @@ def build(key, t):
         t = max(m["e"] for m in fat) + 12; log(f"  moment is in Al-Fatiha -> using the surah after it (t={t:.0f})")
     for sur in guess_surahs(tr, t, W):
         ms = match(W, sur)
-        ch = chain(ms, t)
+        ch = chain(ms, t, sur)
         if not ch: continue
         if ch[0]["v"] == 1 and sur in MUQ: s0 = start_before(src, ch[0]["s"])
         else: s0 = snap(src, ch[0]["s"], 1.6, 0.25, "start")
