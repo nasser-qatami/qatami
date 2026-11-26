@@ -280,7 +280,10 @@ function toggle(){const el=secs[cur];if(!el)return;if(A.paused){play();}else{A.p
 function play(){const el=secs[cur];A.play().then(()=>{needTap=false;el.classList.remove('paused');el._v&&el._v.play().catch(()=>{})}).catch(()=>{needTap=true;el.classList.add('paused')})}
 A.addEventListener('play',()=>secs[cur]&&secs[cur].classList.add('play'));A.addEventListener('pause',()=>secs[cur]&&secs[cur].classList.remove('play'));
 A.addEventListener('ended',()=>{const n=secs[cur+1];if(n)n.scrollIntoView({behavior:'smooth'});else{A.currentTime=0;play()}});
-function go(i){if(i===cur)return;secs.forEach((x,j)=>{if(j!==i){x.classList.remove('act','play','paused');x._v&&x._v.pause()}});cur=i;const el=secs[i],r=D[i];el.classList.add('act');
+function rst(x){/* a reel that is left goes back to a clean state, so coming back to it never finds a half-open or half-swapped explanation sheet */
+ x.classList.remove('tfo');const tf=x.querySelector('.tfs');if(tf){tf.style.transform='';tf.classList.remove('drag');const p=tf.querySelector('p'),tb=tf.querySelector('.tb');if(p){p.classList.remove('sw');p.style.transform=''}if(tb){tb.classList.remove('auto');tb.scrollTop=0}}
+ x._tk=undefined;x._room=undefined;x._y=0}
+function go(i){if(i===cur)return;secs.forEach((x,j)=>{if(j!==i){x.classList.remove('act','play','paused');x._v&&x._v.pause();rst(x)}});cur=i;const el=secs[i],r=D[i];el.classList.add('act');void el.offsetHeight;
  A.src=r.aud;A.currentTime=0;if(el._v){el._v.currentTime=0}el._tick();play();S('rl/v/'+r.k,'سورة '+r.surah);history.replaceState(null,'','#'+r.k);try{H&&H.at&&H.at(r.k)}catch{}}
 let pend=0,want=-1;const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&e.intersectionRatio>.6){want=secs.indexOf(e.target);clearTimeout(pend);if(cur<0)go(want);else pend=setTimeout(()=>go(want),160)}}),{threshold:[.6]});
 let started=false;
