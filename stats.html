@@ -463,7 +463,15 @@ const saveCache = o => { try { localStorage.setItem(CK + range, JSON.stringify(o
 const readCache = () => { try { return JSON.parse(localStorage.getItem(CK + range) || "null"); } catch { return null; } };
 /* ---- marked moments and whether a reel already covers each ---- */
 const MK_FROM = "2026-11-21";
+let NAMES = {};
+/* real names for every recording (collection + title) from the site data, so a mark reads «فروض ١٤٣٦هـ · عشاء ٧ رجب» and not a code */
+async function trackNames() {
+  try { const t = await (await fetch("index.html")).text(), i = t.indexOf('id="qdata">') + 11, j = t.indexOf("</scr" + "ipt>", i), out = {};
+    for (const c of JSON.parse(t.slice(i, j))) for (const r of c.tracks || []) out[c.id + ":" + r.id] = { c: c.title, t: r.title };
+    return out; } catch { return {}; }
+}
 function keyLabel(k) {
+  const n = NAMES[k]; if (n) return n.t.length > 60 ? n.t.slice(0, 58) + "…" : n.t;
   const m = /^r(\d+):n(\d+)(t?)$/.exec(k); if (m) { let n = m[2], part = ""; if (n.length === 3 && /[12]$/.test(n) && +n.slice(0, 2) > 26) { part = n[2] === "1" ? " · الجزء الأول" : " · الجزء الثاني"; n = n.slice(0, 2); } return (m[3] ? "قيام" : "تراويح") + " ليلة " + dg(+n) + " · رمضان " + dg(m[1]) + "هـ" + part; }
   return k;
 }
@@ -473,7 +481,8 @@ async function loadMarks() {
   const box = $("mkp");
   if (!box.dataset.fresh) { try { const c = localStorage.getItem("qtm-stats-marks2"); if (c) box.innerHTML = c; } catch {} }
   try {
-    const [hits, reels] = await Promise.all([allHits(`start=${iso(new Date(MK_FROM + "T00:00:00"))}&end=${iso(new Date(), 1)}`), fetch("reels.json", { cache: "no-store" }).then(r => r.json()).catch(() => [])]);
+    const [hits, reels, names] = await Promise.all([allHits(`start=${iso(new Date(MK_FROM + "T00:00:00"))}&end=${iso(new Date(), 1)}`), fetch("reels.json", { cache: "no-store" }).then(r => r.json()).catch(() => []), trackNames()]);
+    NAMES = names;
     const raw = [];
     for (const h of hits) { const m = /^mk\/([^@]+)@(\d+)$/.exec(h.path || ""); if (m && h.event) raw.push({ key: m[1], t: +m[2], n: h.count || 0, src: "ناس" }); }
     try { const mine = JSON.parse(localStorage.getItem("qtm:marks") || "{}"); for (const k in mine) (mine[k] || []).forEach(x => raw.push({ key: k, t: x.t, n: 1, src: "جهازك" })); } catch {}
@@ -485,7 +494,7 @@ async function loadMarks() {
     const done = moments.filter(m => m.reel).length, todo = moments.length - done;
     if (!moments.length) { box.innerHTML = '<div class="empty">ما فيه علامات مسجّلة بعد</div>'; return; }
     box.innerHTML = `<div class="mks"><div><b>${dg(moments.length)}</b><span>لحظة معلَّمة</span></div><div class="ok"><b>${dg(done)}</b><span>لها نفحة</span></div><div class="no"><b>${dg(todo)}</b><span>بدون نفحة</span></div></div>`
-      + moments.map(m => `<div class="mk"><span>${esc(keyLabel(m.key))}</span><small>عند ${mmss(m.t)}${m.t2 - m.t > 5 ? " – " + mmss(m.t2) : ""} · ${dg(m.n)} ${m.n > 2 ? "علامات" : m.n === 2 ? "علامتان" : "علامة"} · ${m.srcs.join(" + ")}</small><span class="st ${m.reel ? "ok" : "no"}">${m.reel ? "نفحة: " + esc(m.reel.surah) + " " + esc(m.reel.range) : "بدون نفحة"}</span></div>`).join("")
+      + moments.map(m => `<div class="mk"><span>${esc(keyLabel(m.key))}</span><small>${NAMES[m.key] ? esc(NAMES[m.key].c) + " · " : ""}عند ${mmss(m.t)}${m.t2 - m.t > 5 ? " – " + mmss(m.t2) : ""} · ${dg(m.n)} ${m.n > 2 ? "علامات" : m.n === 2 ? "علامتان" : "علامة"} · ${m.srcs.join(" + ")}</small><span class="st ${m.reel ? "ok" : "no"}">${m.reel ? "نفحة: " + esc(m.reel.surah) + " " + esc(m.reel.range) : "بدون نفحة"}</span></div>`).join("")
       + `<div class="mkn">العلامات المتقاربة (خلال ٢٥ ثانية) تُحسب لحظة وحدة. للّي بدون نفحة، قل لي «حدّث النفحات» وأسوي لها.${todo ? "" : " كل اللحظات المعلَّمة لها نفحات."}</div>`;
     box.dataset.fresh = "1"; try { localStorage.setItem("qtm-stats-marks2", box.innerHTML); } catch {}
   } catch (e) { if (!box.dataset.fresh && !box.innerHTML.trim()) box.innerHTML = '<div class="empty">تعذر تحميل العلامات</div>'; }
