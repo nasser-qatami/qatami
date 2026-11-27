@@ -1726,6 +1726,7 @@ function fardRow(r, playing, isFav, isDone, prog) {
   if (pos[r.key] > 5 && !isDone) sub.push(`توقفت عند ${fmt(pos[r.key])}`);
   if (isDone) sub.push(`<span class="done">✓ استمعت</span>`);
   if (offSaved(r)) sub.push(`<span class="done">⤓ محمّلة</span>`);
+  if (r.vurl && !extMode) { const on = VMODE.has(r.key) && playing; sub.push(`<button type="button" class="vtag ${on ? "on" : ""}" data-vmode="${esc(r.key)}" aria-pressed="${on}" aria-label="${on ? "الرجوع للصوت" : "مشاهدة المقطع المرئي"}">${icon("i-play")}مرئي</button>`); }
   return `<li class="fy${playing ? " playing" : ""}${isDone ? " heard" : ""}" data-key="${esc(r.key)}" data-pr="${esc(r.prayer || "")}" data-day="${r.date ? r.date[0] : ""}">${prog ? `<i class="tprog" style="--p:${prog.toFixed(3)}" aria-hidden="true"></i>` : ""}
     <button class="fday" data-play="${esc(r.key)}" aria-label="تشغيل ${esc(r.title)}"><b>${r.date ? AR(r.date[0]) : "—"}</b><small>${esc(r.prayer || "")}</small><span class="pi">${icon(playing && !audio.paused ? "i-pause" : "i-play")}</span></button>
     <div class="info"><span class="ttl long">${esc(fardTitle(r.title))}</span><span class="sub">${sub.filter(Boolean).join(" · ")}</span></div>
